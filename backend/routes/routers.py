@@ -1,7 +1,7 @@
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
-from schemas.router_schemas import RouterMain, RouterRequest, RouterId
-from utils.utils import get_customer, get_pppoe, get_paket
+from backend.schemas.router_schemas import RouterMain, RouterRequest, RouterId
+from backend.utils.utils import get_customer_data, get_pppoe_data, get_paket_data
 from aiomysql import Connection
 import asyncio
 
@@ -103,8 +103,11 @@ async def get_customer(websocket: WebSocket, conn : Connection = Depends(databas
             await cursor.execute("SELECT * FROM tbl_pelanggan")
             db_customer = await cursor.fetchall()
 
+            await cursor.execute("SELECT * FROM tbl_router")
+            mikrotik_list = await cursor.fetchall()
+
             while True:
-                mikrotik_user = await get_customer()
+                mikrotik_user = await get_customer_data(data=mikrotik_list)
 
                 online_list = any(m['mac'] == db_customer['mac_address'] for m in mikrotik_user)
 
@@ -124,7 +127,7 @@ async def get_customer(websocket: WebSocket, conn : Connection = Depends(databas
                     "data" : active_user
                 })
 
-                asyncio.sleep(5)
+                await asyncio.sleep(15)
 
     except WebSocketDisconnect as e:
         raise e
@@ -136,7 +139,11 @@ async def get_customer(websocket: WebSocket, conn : Connection = Depends(databas
         )
     
     finally:
-        await websocket.close()
+        try:
+            await websocket.close()
+        except:
+            pass
+
 
 @router.websocket("/api/router/paket")
 async def get_secret(websocket : WebSocket, conn : Connection = Depends(database_connection)):
@@ -166,7 +173,7 @@ async def get_pppoe(websocket : WebSocket, conn : Connection = Depends(database_
             data_pppoe = await cursor.fetchall()
 
             while True:
-                mikrotik_pppoe = await get_pppoe()
+                mikrotik_pppoe = await get_pppoe_data()
 
                 pppoe_list = any(m['username'] == data_pppoe['username'] for m in mikrotik_pppoe)
 

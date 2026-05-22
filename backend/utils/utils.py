@@ -3,16 +3,13 @@ import jwt
 import datetime
 import routeros_api
 from dotenv import load_dotenv
-from schemas.router_schemas import RouterConnect
+from backend.schemas.router_schemas import RouterConnect
 from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = "HS256"
-
-# check apakah password telah di hash
-from werkzeug.security import check_password_hash
 
 def verify_password(password: str, hash_password):
     if not hash_password or not password:
@@ -31,7 +28,7 @@ def create_access_token(data: dict):
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # mengambil data dari router
-def get_customer(data: RouterConnect):
+def get_customer_data(data: RouterConnect):
     try:
         connection = routeros_api.RouterOsApiPool(
             data.host,
@@ -50,7 +47,7 @@ def get_customer(data: RouterConnect):
     except Exception as e:
         raise e
 
-def get_paket(data : RouterConnect):
+def get_paket_data(data : RouterConnect):
     try:
         connection = routeros_api.RouterOsApiPool(
             data.host,
@@ -68,7 +65,7 @@ def get_paket(data : RouterConnect):
     except Exception as e:
         raise e
     
-def get_pppoe(data : RouterConnect):
+def get_pppoe_data(data : RouterConnect):
     try:
         connection = routeros_api.RouterOsApiPool(
             data.host,

@@ -1,7 +1,7 @@
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status
-from schemas.auth_schemas import LoginRequest, LoginResponse, LoginPost
-from utils.utils import create_access_token, hash_password, verify_password
+from backend.schemas.auth_schemas import LoginRequest, LoginResponse, LoginPost
+from backend.utils.utils import create_access_token, hash_password, verify_password
 from aiomysql import Connection
 
 router = APIRouter(
@@ -74,7 +74,7 @@ async def register(data: LoginPost, conn : Connection = Depends(database_connect
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Database Error!"
+            detail=f"Database Error! {e}"
         )
 
 @router.post("/api/logout")

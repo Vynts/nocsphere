@@ -1,8 +1,8 @@
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status
 from aiomysql import Connection
-from schemas.user_schemas import UserMain, UserRequest, UserResponse, UserId
-from utils.utils import hash_password
+from backend.schemas.user_schemas import UserMain, UserRequest, UserResponse, UserId
+from backend.utils.utils import hash_password
 
 router = APIRouter(
     tags=["User"]
