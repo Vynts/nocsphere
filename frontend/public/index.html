@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NocSphere - Billing Management System for MikroTik Business</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fafafa;
+            color: #111111;
+            overflow-x: hidden;
+        }
+        .bg-dark-custom {
+            background-color: #060913;
+        }
+        .text-purple {
+            color: #8b5cf6;
+        }
+        .btn-custom-light {
+            background-color: #ffffff;
+            color: #000000;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 10px 24px;
+        }
+        .btn-custom-outline {
+            border: 1px solid #ffffff33;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 10px 24px;
+        }
+        .btn-custom-dark {
+            background-color: #000000;
+            color: #ffffff;
+            font-weight: 500;
+            border-radius: 30px;
+            padding: 8px 20px;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-custom-dark:hover {
+            background-color: #222222;
+            color: #ffffff;
+        }
+        .product-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background: #ffffff;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #ffffff;
+            height: 100%;
+        }
+        
+        /* Fix ukuran box icon agar sejajar sempurna */
+        .icon-box {
+            width: 48px;
+            height: 48px;
+            background-color: #060913;
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .btn-join-discord {
+            background-color: #18191c;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 50px;
+            padding: 12px 28px;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-join-discord:hover {
+            background-color: #2f3136;
+            color: #ffffff;
+        }
+
+        .footer-link-custom {
+            color: rgba(255, 255, 255, 0.45);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-link-custom:hover {
+            color: #a855f7 !important;
+        }
+
+        .footer-heading {
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .text-purple {
+            color: #a855f7;
+        }
+
+        .footer-watermark-container {
+            width: 100%;
+            text-align: center;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .footer-watermark-text {
+            font-size: clamp(4rem, 16vw, 15rem);
+            font-weight: 900;
+            color: #282b35;
+            line-height: 0.75;
+            user-select: none;
+            letter-spacing: -4px;
+        }
+
+        .social-links a {
+            color: rgba(255, 255, 255, 0.4);
+            transition: color 0.2s;
+        }
+        
+        .social-links a:hover {
+            color: #ffffff;
+        }
+        
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: #0b1120;
+                padding: 20px;
+                border-radius: 12px;
+                margin-top: 15px;
+                border: 1px solid #ffffff1a;
+            }
+            .hero-title {
+                font-size: 2.25rem !important;
+            }
+            .footer-watermark-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="bg-dark-custom text-white pt-2 pb-5 position-relative" style="background: linear-gradient(180deg, #060913 0%, #0b1120 100%);">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark pt-3">
+                <div class="container-fluid px-0">
+                    <a class="navbar-brand fw-bold d-flex align-items-center" href="#">
+                        <i class="bi bi-hexagon-fill text-primary me-2"></i> NocSphere
+                    </a>
+                    
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    
+                    <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                        <ul class="navbar-nav gap-2 gap-lg-3 text-center my-3 my-lg-0">
+                            <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+                            <li class="nav-item"><a class="nav-link text-white-50" href="#">PPPoE Management</a></li>
+                            <li class="nav-item"><a class="nav-link text-white-50" href="#">Hotspot Voucher</a></li>
+                            <li class="nav-item"><a class="nav-link text-white-50" href="#">Multi Router API</a></li>
+                            <li class="nav-item"><a class="nav-link text-white-50" href="#">Payment Gateway</a></li>
+                        </ul>
+                        <div class="d-lg-none d-grid gap-2 mt-3">
+                            <a href="#" class="btn btn-light rounded-pill fw-600">Admin Area</a>
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="btn btn-sm btn-light rounded-pill px-4 fw-600 d-none d-lg-inline-block">Admin Area</a>
+                </div>
+            </nav>
+
+            <div class="row py-5 my-3 justify-content-center text-center">
+                <div class="col-lg-9">
+                    <h1 class="display-4 hero-title fw-bold mb-3">Best Solution for <span class="text-white-50">Your MikroTik Business</span></h1>
+                    <p class="text-white-50 mx-auto mb-4 px-2" style="max-width: 600px; font-size: 15px;">
+                        Enterprise-grade billing management system to automate your ISP or RT/RW Net business. Integrate smoothly with multi-router networks and automatic isolated system.
+                    </p>
+                    
+                    <div class="d-flex flex-wrap justify-content-center gap-3 mb-5 px-3 text-white-50" style="font-size: 13px;">
+                        <span><i class="fa-solid fa-circle-check text-success me-1"></i> API Connection Stable</span>
+                        <span><i class="fa-solid fa-network-wired text-danger me-1"></i> Automated Isolation</span>
+                        <span><i class="fa-solid fa-bolt text-warning me-1"></i> Realtime Synchronized</span>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 px-4">
+                        <a href="#" class="btn btn-custom-light">Get Started <i class="fa-solid fa-arrow-right ms-1" style="font-size: 12px;"></i></a>
+                        <a href="#" class="btn btn-custom-outline">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="container py-5">
+        <div class="text-center mb-5">
+            <span class="text-uppercase text-muted tracking-wider small fw-bold">Solutions</span>
+            <h2 class="fw-bold mt-1">Our Billing Management</h2>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-sm-10 col-md-6 col-lg-3">
+                <div class="product-card p-4 d-flex flex-column h-100">
+                    <h5 class="fw-bold mb-1">PPPoE Billing</h5>
+                    <p class="text-muted small mb-3">Starting at</p>
+                    <h3 class="fw-bold mb-4">Rp 40.000 <span class="fs-6 text-muted fw-normal">/month</span></h3>
+                    
+                    <ul class="list-unstyled mb-4 flex-grow-1 text-muted small" style="line-height: 2.2;">
+                        <li><i class="fa-solid fa-user-check me-2"></i> Auto Create Secrets & Profiles</li>
+                        <li><i class="fa-solid fa-ban me-2"></i> Automated Isolation System</li>
+                        <li><i class="fa-solid fa-receipt me-2"></i> WhatsApp PDF Invoice</li>
+                        <li><i class="fa-solid fa-chart-line me-2"></i> Realtime Traffic Monitor</li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center mb-3 text-muted gap-2">
+                        <i class="fa-solid fa-network-wired text-primary"></i>
+                        <span class="small fw-600 text-dark">MikroTik API v7</span>
+                    </div>
+                    <a href="#" class="btn btn-custom-dark mt-auto">Learn More</a>
+                </div>
+            </div>
+
+            <div class="col-sm-10 col-md-6 col-lg-3">
+                <div class="product-card p-4 d-flex flex-column h-100">
+                    <h5 class="fw-bold mb-1">Hotspot Voucher</h5>
+                    <p class="text-muted small mb-3">Starting at</p>
+                    <h3 class="fw-bold mb-4">Rp 40.000 <span class="fs-6 text-muted fw-normal">/month</span></h3>
+                    
+                    <ul class="list-unstyled mb-4 flex-grow-1 text-muted small" style="line-height: 2.2;">
+                        <li><i class="fa-solid fa-ticket me-2"></i> Bulk Voucher Generator</li>
+                        <li><i class="fa-solid fa-clock me-2"></i> Time & Volume Limiters</li>
+                        <li><i class="fa-solid fa-print me-2"></i> Ready-to-print Template</li>
+                        <li><i class="fa-solid fa-qrcode me-2"></i> Scan QR Code Login</li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center mb-3 text-muted gap-2">
+                        <i class="fa-solid fa-wifi text-warning"></i>
+                        <span class="small fw-600 text-dark">User Manager Sync</span>
+                    </div>
+                    <a href="#" class="btn btn-custom-dark mt-auto">Learn More</a>
+                </div>
+            </div>
+
+            <div class="col-sm-10 col-md-6 col-lg-3">
+                <div class="product-card p-4 d-flex flex-column h-100">
+                    <h5 class="fw-bold mb-1">Multi Router API</h5>
+                    <p class="text-muted small mb-3">Starting at</p>
+                    <h3 class="fw-bold mb-4">Rp 10.000 <span class="fs-6 text-muted fw-normal">/router</span></h3>
+                    
+                    <ul class="list-unstyled mb-4 flex-grow-1 text-muted small" style="line-height: 2.2;">
+                        <li><i class="fa-solid fa-server me-2"></i> Centralized Control Dashboard</li>
+                        <li><i class="fa-solid fa-layer-group me-2"></i> Unlimited Router Boards</li>
+                        <li><i class="fa-solid fa-eye me-2"></i> Resource & CPU Monitoring</li>
+                        <li><i class="fa-solid fa-shield-halved me-2"></i> Secure SSL API Port</li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center mb-3 text-muted gap-2">
+                        <i class="fa-solid fa-cubes text-info"></i>
+                        <span class="small fw-600 text-dark">FastAPI Fast Sync</span>
+                    </div>
+                    <a href="#" class="btn btn-custom-dark mt-auto">Learn More</a>
+                </div>
+            </div>
+
+            <div class="col-sm-10 col-md-6 col-lg-3">
+                <div class="product-card p-4 d-flex flex-column h-100">
+                    <h5 class="fw-bold mb-1">Payment Gateway</h5>
+                    <p class="text-muted small mb-3">Starting at</p>
+                    <h3 class="fw-bold mb-4">Rp 13.000 <span class="fs-6 text-muted fw-normal">/month</span></h3>
+                    
+                    <ul class="list-unstyled mb-4 flex-grow-1 text-muted small" style="line-height: 2.2;">
+                        <li><i class="fa-solid fa-qrcode me-2"></i> QRIS Automatic Detection</li>
+                        <li><i class="fa-solid fa-building-columns me-2"></i> Virtual Accounts (VA)</li>
+                        <li><i class="fa-solid fa-store me-2"></i> Alfa / Indo Retail Outlets</li>
+                        <li><i class="fa-solid fa-money-bill-transfer me-2"></i> Low Fee Transaction Rate</li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center mb-3 text-muted gap-2">
+                        <i class="fa-solid fa-credit-card text-success"></i>
+                        <span class="small fw-600 text-dark">Xendit / Midtrans</span>
+                    </div>
+                    <a href="#" class="btn btn-custom-dark mt-auto">Learn More</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container py-5">
+        <div class="text-center mb-5">
+            <span class="text-uppercase text-muted tracking-wider small fw-bold">Why Choose Us</span>
+            <h2 class="fw-bold mt-1">Built for Performance</h2>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-sm-10 col-md-6">
+                <div class="feature-card p-4 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="icon-box mb-3"><i class="fa-solid fa-sliders"></i></div>
+                        <h5 class="fw-bold mb-2">Feature Rich Control Panel</h5>
+                        <p class="text-muted small mb-4">Introducing our billing game-changer dashboard, built with features that will simplify your ISP business management.</p>
+                    </div>
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Control Panel Preview" class="img-fluid rounded-3 mt-2" style="max-height: 200px; width: 100%; object-fit: cover;">
+                </div>
+            </div>
+
+            <div class="col-sm-10 col-md-6 d-flex flex-column gap-4">
+                <div class="feature-card p-4">
+                    <div class="icon-box mb-3"><i class="fa-solid fa-microchip"></i></div>
+                    <h5 class="fw-bold mb-2">High Efficiency API Queries</h5>
+                    <p class="text-muted small mb-0">We use high-optimized asynchronous Python scripts to query MikroTik data, ensuring your Router CPU usage stays minimal.</p>
+                </div>
+                <div class="feature-card p-4">
+                    <div class="icon-box mb-3"><i class="fa-solid fa-eye"></i></div>
+                    <h5 class="fw-bold mb-2">Data Transparency & Analytics</h5>
+                    <p class="text-muted small mb-0">Track exact data usage, payment reports, log files, and bandwidth utilization anytime without hidden summaries.</p>
+                </div>
+            </div>
+
+            <div class="col-sm-12 col-12 mt-2">
+                <div class="feature-card p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 w-100">
+                    <div class="d-flex align-items-center gap-3 flex-grow-1">
+                        <div class="icon-box"><i class="fa-brands fa-discord"></i></div>
+                        <div>
+                            <h5 class="fw-bold mb-1">Active Community</h5>
+                            <p class="text-muted small mb-0">We have an active community filled with enthusiastic gamers and developers, we also have a 24/7 support team.</p>
+                        </div>
+                    </div>
+                    <div class="d-grid d-md-block mt-2 mt-md-0">
+                        <a href="#" class="btn-join-discord text-nowrap">Join Now <i class="fa-solid fa-arrow-right ms-2" style="font-size: 13px;"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="footer-watermark-container bg-dark-custom py-5">
+        <div class="py-4">
+            <div class="footer-watermark-text text-nowrap">nocsphere</div>
+        </div>
+    </section>
+
+    <footer class="bg-dark-custom text-white pt-5 pb-4 border-top border-secondary border-opacity-10 position-relative" style="min-height: 450px;">
+        <div class="container overflow-hidden">
+
+            <div class="row g-4 mb-5 text-start position-relative" style="z-index: 2;">
+                
+                <div class="col-lg-4 col-md-12 mb-4 mb-lg-0">
+                    <a class="navbar-brand fw-bold d-flex align-items-center mb-3 text-white fs-5" href="#">
+                        <i class="bi bi-hexagon-fill text-primary me-2"></i> NocSphere
+                    </a>
+                    <p class="text-white-50 small lh-lg mb-3" style="max-width: 350px;">
+                        NocSphere provides high-performing billing management systems with unmatched reliability and automated isolation features.
+                    </p>
+                    <p class="fw-bold small mb-1">PT NocSphere Inovasi Teknologi</p>
+                    <p class="text-white-50 small mb-3">Serving the best web billing management community</p>
+                    
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-1.5 small">Stripe Verified</span>
+                        <span class="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-1.5 small">PCI Compliant</span>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 col-md-12">
+                    <div class="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-4">
+                        
+                        <div>
+                            <h6 class="fw-bold footer-heading text-uppercase mb-3">Solutions</h6>
+                            <div class="d-flex flex-column">
+                                <a href="#" class="footer-link-custom">PPPoE Accounts</a>
+                                <a href="#" class="footer-link-custom">Hotspot Voucher</a>
+                                <a href="#" class="footer-link-custom">Multi Router API</a>
+                                <a href="#" class="footer-link-custom">Payment Gateway</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold footer-heading text-uppercase mb-3">Legal</h6>
+                            <div class="d-flex flex-column">
+                                <a href="#" class="footer-link-custom">Fair Use</a>
+                                <a href="#" class="footer-link-custom">Terms</a>
+                                <a href="#" class="footer-link-custom">Privacy</a>
+                                <a href="#" class="footer-link-custom">SLA</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold footer-heading text-uppercase mb-3">Services</h6>
+                            <div class="d-flex flex-column">
+                                <a href="#" class="footer-link-custom">Client Area</a>
+                                <a href="#" class="footer-link-custom">Status</a>
+                                <a href="#" class="footer-link-custom">Discord</a>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h6 class="fw-bold footer-heading text-uppercase mb-3">Resources</h6>
+                            <div class="d-flex flex-column">
+                                <a href="#" class="footer-link-custom">Documentation</a>
+                                <a href="#" class="footer-link-custom">MikroTik MIB API</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary border-opacity-10 my-4">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 position-relative" style="z-index: 2;">
+                <span class="text-white-50 small">&copy; 2026 NocSphere. All rights reserved.</span>
+                <div class="d-flex gap-3 fs-5 social-links">
+                    <a href="#"><i class="fa-brands fa-discord"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#"><i class="fa-brands fa-github"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
