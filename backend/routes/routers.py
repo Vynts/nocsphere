@@ -1,20 +1,51 @@
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
-from backend.schemas.router_schemas import RouterMain, RouterRequest, RouterId
-from backend.utils.utils import get_customer_data, get_pppoe_data, get_paket_data
+from backend.schemas.router_schemas import RouterCreate, RouterResponse, RouterUpdate, RouterConnect, ProfileCreate
+from backend.utils.security import generate_password_hash, check_password_hash, get_current_perusahaan
+from backend.utils.routers import get_active, get_profile, get_secret, add_profile, connect_to_router
 from aiomysql import Connection
 import asyncio
 
 router = APIRouter( 
-    tags=["Router"]
+    prefix="/api/router",
+    tags=["Router Management"]
 )
 
-@router.get("/api/router", response_model=RouterMain)
-async def get_router(conn: Connection = Depends(database_connection)):
+# route untuk melihat data router yang akan dipakai sebagai penggambilan data
+
+@router.get("")
+async def get_router_by_id(id_router: int, current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
+    try:
+        async with conn.cursor() as cursor:
+            await cursor.execute("SELECT * FROM tbl_router WHERE id_router = %s AND id_perusahaan = %s", (id_router, current_id))
+            router_list = await cursor.fetchone()
+
+            router = RouterConnect(
+                host=router_list['host'],
+                username_router=router_list['username_router'],
+                password_router=router_list['password_router'],
+                port=router_list['port']
+            )
+
+            connection = connect_to_router(data=router)
+
+            return connection
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database Error! {e}"
+        )
+
+@router.get("/list", response_model=RouterResponse)
+async def get_router(current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
 
-            await cursor.execute("SELECT * FROM tbl_router")
+            await cursor.execute("SELECT * FROM tbl_router ORDER BY desc WHERE id_perusahaan = %s", (current_id))
             mikrotik_list = await cursor.fetchall()
 
         return mikrotik_list
@@ -27,12 +58,15 @@ async def get_router(conn: Connection = Depends(database_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database Error! {e}"
         )
+    
 
-@router.post("/api/router/add")
-async def add_router(data : RouterRequest ,conn : Connection = Depends(database_connection)):
+# Route untuk menambahkan data router
+
+@router.post("/add", response_model=dict, status_code=status.HTTP_201_CREATED)
+async def add_router(data : RouterCreate, current_id: int = Depends(get_current_perusahaan), conn : Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("INSERT INTO tbl_router (label_router, host, username_router, password_router, port) VALUES (%s, %s, %s, %s, %s)", (data.label_router, data.host, data.username_router, data.password_router, data.port))
+            await cursor.execute("INSERT INTO tbl_router (label_router, host, username_router, password_router, port, id_perusahaan) VALUES (%s, %s, %s, %s, %s, %s)", (data.label_router, data.host, data.username_router, data.password_router, data.port, current_id))
             await conn.commit()
 
         return {
@@ -50,11 +84,14 @@ async def add_router(data : RouterRequest ,conn : Connection = Depends(database_
             detail=f"Terjadi Kesalahan! {e}"
         )
 
-@router.put("/api/router/edit")
-async def edit_router(data : RouterMain, conn : Connection = Depends(database_connection)):
+
+# Route untuk mengedit dan mengupdate data router
+
+@router.put("/edit", response_model=dict, status_code=status.HTTP_200_OK)
+async def edit_router(data : RouterUpdate, current_id: int = Depends(get_current_perusahaan), conn : Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("UPDATE tbl_router SET nama_router=%s, host=%s, username_router=%s, password_router=%s, port=%s WHERE id_router=%s", (data.nama_router, data.host, data.username_router, data.password_router, data.port, data.id_router))
+            await cursor.execute("UPDATE tbl_router SET label_router=%s, host=%s, username_router=%s, password_router=%s, port=%s WHERE id_router=%s AND id_perusahaan = %s", (data.label_router, data.host, data.username_router, data.password_router, data.port, data.id_router, current_id))
             await conn.commit()
 
         return {
@@ -73,11 +110,13 @@ async def edit_router(data : RouterMain, conn : Connection = Depends(database_co
         )
 
 
-@router.delete("/api/router/delete")
-async def delete_router(data: RouterId, conn : Connection = Depends(database_connection)):
+# Route untuk menghapus data router
+
+@router.delete("/delete", response_model=dict, status_code=status.HTTP_200_OK)
+async def delete_router(data: int, current_id: int = Depends(get_current_perusahaan), conn : Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("DELETE FROM tbl_router WHERE id_router=%s", (data.id_router))
+            await cursor.execute("DELETE FROM tbl_router WHERE id_router=%s AND id_perusahaan = %s", (data, current_id))
             await conn.commit()
 
         return {
@@ -95,41 +134,34 @@ async def delete_router(data: RouterId, conn : Connection = Depends(database_con
             detail=f"Terjadi Kesalahan! {e}"
         )
 
-@router.websocket("/api/router/pelanggan")
-async def get_customer(websocket: WebSocket, conn : Connection = Depends(database_connection)):
-    await websocket.accept()
+
+# route untuk menampilkan PPPoE untuk membuat paket,user baru
+
+@router.get("/paket", response_model=dict)
+async def get_secret(id_router: int, current_id: int = Depends(get_current_perusahaan), conn : Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("SELECT * FROM tbl_pelanggan")
-            db_customer = await cursor.fetchall()
+            await cursor.execute("SELECT host, username_router, password_router, port FROM tbl_router WHERE id_router = %s AND id_perusahaan = %s", (id_router, current_id))
+            router_list = await cursor.fetchone()
 
-            await cursor.execute("SELECT * FROM tbl_router")
-            mikrotik_list = await cursor.fetchall()
+            if not router_list:
+                return "tidak ada data router di dalam database"
+            
+            router = RouterConnect(
+                host=router_list['host'],
+                username_router=router_list['username_router'],
+                password_router=router_list['password_router'],
+                port=router_list['port']
+            )
 
-            while True:
-                mikrotik_user = await get_customer_data(data=mikrotik_list)
+            profiles = await get_profile(data=router)
 
-                online_list = any(m['mac'] == db_customer['mac_address'] for m in mikrotik_user)
+            return {
+                "status" : "success",
+                "data" : profiles
+            }
 
-                active_user = []
-                for row in db_customer:
-                    active_user.append({
-                            "username" : row['username'],
-                            "no_hp" : row['no_hp'],
-                            "lng" : row['lng'],
-                            "lat" : row['lat'],
-                            "status" : "online" if online_list else "offline"
-                    })
-
-                await websocket.send_json({
-                    "status" : "success",
-                    "total_online" : len(online_list),
-                    "data" : active_user
-                })
-
-                await asyncio.sleep(15)
-
-    except WebSocketDisconnect as e:
+    except HTTPException as e:
         raise e
     
     except Exception as e:
@@ -137,20 +169,36 @@ async def get_customer(websocket: WebSocket, conn : Connection = Depends(databas
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Terjadi Kesalahan! {e}"
         )
-    
-    finally:
-        try:
-            await websocket.close()
-        except:
-            pass
 
+# menambahkan data profile/paket untuk user bisa memilih
 
-@router.websocket("/api/router/paket")
-async def get_secret(websocket : WebSocket, conn : Connection = Depends(database_connection)):
+@router.post("/paket/add", response_model=dict)
+async def add_secret(data: ProfileCreate, current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await conn.execute("SELECT * FROM tbl_paket")
-            data_paket = await cursor.fetchall()
+            await cursor.execute("INSERT INTO tbl_paket (id_router, id_perusahaan, nama_paket, harga, limits, only_one) VALUES (%s, %s, %s, %s, %s)", (data.id_router, current_id, data.nama_paket, data.harga, data.limits, data.only_one))
+            await conn.commit()
+
+            await cursor.execute("SELECT * FROM tbl_router WHERE id_router=%s AND id_perusahaan = %s", (data.id_router, current_id))
+            router_list = await cursor.fetchone()
+
+            router = RouterConnect(
+                host=router_list['host'],
+                username_router=router_list['username_router'],
+                password_router=router_list['password_router'],
+                port=router_list['port']
+            )
+
+            add_paket = await add_profile(data=router, nama_paket=data.nama_paket, limits=data.limits, only_one=data.only_one)
+
+            if not add_paket:
+                raise HTTPException("Data gagal Ditambahkan..")
+
+            return {
+                "status" : "success",
+                "message" : "Data Berhasil ditambahkan!",
+                "redirect_to" : "/router/paket"
+            }
 
     except HTTPException as e:
         raise e
@@ -161,37 +209,11 @@ async def get_secret(websocket : WebSocket, conn : Connection = Depends(database
             detail=f"Terjadi Kesalahan! {e}"
         )
     
-    finally:
-        await websocket.close()
+# @router.put("/api/router/paket/edit")
+# async def edit_paket(data: SecretMain, conn : Connection = Depends(database_connection)):
+#     try:
+#         async with conn.cursor() as cursor:
+#             await cursor.execute("UPDATE tbl_paket SET id_router=%s, nama_paket=%s, harga=%s, limits=%s, only_one=%s WHERE id_paket=%s", (data.id_router, data.nama_paket, data.harga, data.limits, data.only_one, data.id_paket))
+#             await conn.commit()
 
 
-@router.websocket("/api/router/pppoe")
-async def get_pppoe(websocket : WebSocket, conn : Connection = Depends(database_connection)):
-    try:
-        async with conn.cursor as cursor:
-            await cursor.execute("SELECT * FROM tbl_pppoe")
-            data_pppoe = await cursor.fetchall()
-
-            while True:
-                mikrotik_pppoe = await get_pppoe_data()
-
-                pppoe_list = any(m['username'] == data_pppoe['username'] for m in mikrotik_pppoe)
-
-                pppoe = []
-                for row in data_pppoe:
-                    pppoe.append({
-                        "username" : row['username'],
-                        
-                    })
-
-    except HTTPException as e:
-        raise e
-    
-    except Exception as e:
-        raise Exception(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail = f"Terjadi Kesalahan! {e}"
-        )
-    
-    finally:
-        await websocket.close()

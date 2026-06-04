@@ -1,44 +1,44 @@
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status
-from backend.schemas.auth_schemas import LoginRequest, LoginResponse, LoginPost
-from backend.utils.utils import create_access_token, hash_password, verify_password
+from backend.schemas.auth_schemas import LoginRequest, TokenResponse
+from backend.schemas.perusahaan_schemas import PerusahaanCreate
+from backend.utils.security import create_access_token, generate_password_hash, verify_password
 from aiomysql import Connection
 
 router = APIRouter(
-    tags=["Auth"]
+    prefix="/api/auth",
+    tags=["Auth Management"]
 )
 
-@router.post("/api/login", response_model=LoginResponse)
-async def login(data: LoginRequest, conn: Connection = Depends(database_connection)):
+@router.post("/login", response_model=TokenResponse)
+async def login(payload: LoginRequest, conn: Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("SElECT * FROM tbl_user WHERE email = %s", (data.email,))
-            user = await cursor.fetchone()
+            await cursor.execute("SELECT id_perusahaan, password, level FROM tbl_user WHERE email = %s", (payload.email,))
+            perusahaan = await cursor.fetchone()
 
-        if not user:
+        if not perusahaan:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="User tidak Ditemukan!"
             )
+        
+        id_perusahaan = perusahaan['id_perusahaan']
 
-        if not user and not verify_password(data.password, user['password']):
+        if not perusahaan and not verify_password(payload.password, perusahaan['password']):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Username atau Password Salah!"
             )
 
-        payload = {
-            "sub" : str(user['username']),
-            "level" : str(user['level'])
-        }
-                
-        token = create_access_token(payload)
+        access_token = create_access_token(data={"id_perusahaan": id_perusahaan})
 
         return {
             "status" : "success",
             "message" : "Login Berhasil!",
-            "token" : token,
-            "level" : user['level'],
+            "access_token" : access_token,
+            "token_type": "bearer",
+            "level" : perusahaan['level'],
             "redirect_to" : "/dashboard"
         }
     
@@ -53,13 +53,15 @@ async def login(data: LoginRequest, conn: Connection = Depends(database_connecti
             detail=f"Terjadi kesalahan: {str(e)}" 
         )
 
-@router.post("/api/register")
-async def register(data: LoginPost, conn : Connection = Depends(database_connection)):
+@router.post("/register", response_model=dict, status_code=status.HTTP_201_CREATED)
+async def register(data: PerusahaanCreate, conn : Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("INSERT INTO tbl_user (username, email, password) VALUES (%s, %s, %s)", (data.username, data.email, hash_password(data.password)))
-            last_id = cursor.lastrowid
-            await cursor.execute("INSERT INTO tbl_pelanggan (id_user, nama_pelanggan, no_hp) VALUES (%s, %s, %s)", (last_id, data.username, data.no_hp))
+            await cursor.execute("INSERT INTO tbl_perusahaan (nama_perusahaan, kontak_perusahaan, alamat_perusahaan) VALUES (%s, %s, %s)", (data.nama_perusahaan, data.kontak_perusahaan, data.alamat_perusahaan))
+            id_perusahaan = cursor.lastrowid
+            password_hashed = generate_password_hash(data.password_perusahaan)
+
+            await cursor.execute("INSERT INTO tbl_user (id_perusahaan, username, email, password) VALUES (%s, %s, %s, %s)", (id_perusahaan, data.username_perusahaan, data.email_perusahaan, password_hashed))
             await conn.commit()
 
         return {
@@ -77,7 +79,7 @@ async def register(data: LoginPost, conn : Connection = Depends(database_connect
             detail=f"Database Error! {e}"
         )
 
-@router.post("/api/logout")
+@router.post("/logout")
 async def logout():
     return {
         "status" : "success",
