@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Nocsphere Host</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #334155;
+            background-color: #ffffff;
+        }
+        .navbar {
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .search-input {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            width: 240px;
+        }
+        .search-kbd {
+            background-color: #cbd5e1;
+            color: #64748b;
+            font-size: 0.75rem;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .sidebar-right {
+            position: sticky;
+            top: 5rem;
+            font-size: 0.85rem;
+        }
+        .sidebar-right a {
+            color: #64748b;
+            text-decoration: none;
+        }
+        .sidebar-right a.active {
+            color: #0d6efd;
+            font-weight: 500;
+        }
+        .custom-card {
+            border: 1px solid #d3d3d3;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            height: 100%;
+        }
+        .custom-card:hover {
+            border-color: #4d9dff;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            color: inherit;
+        }
+        .icon-box {
+            color: #0d6efd;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: inline-block;
+        }
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+        .card-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            line-height: 1.5;
+        }
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-top: 2.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .contact-box {
+            border: 1px solid #f1f5f9;
+            border-radius: 8px;
+            background-color: #fff;
+        }
+        .footer-social a {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-right: 1rem;
+        }
+        .footer-social a:hover {
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top py-2">
+        <div class="container-fluid px-4 mx-5 my-1">
+            <a class="navbar-brand d-flex align-items-center fw-semibold text-dark" href="#" style="font-size: 1rem;">
+                <i class="bi bi-hexagon-fill text-dark me-2"></i> nocsphere docs
+            </a>
+            
+            <div class="d-none d-md-flex align-items-center mx-auto position-relative">
+                <i class="bi bi-search position-absolute text-muted start-3" style="left: 10px;"></i>
+                <input type="text" class="form-control search-input ps-5 pe-5" placeholder="Search...">
+                <span class="position-absolute end-0 me-2 search-kbd">Ctrl K</span>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <a href="#" class="nav-link text-muted me-3" style="font-size: 0.9rem;">Support</a>
+                <a href="#" class="btn btn-primary btn-sm px-3" style="border-radius: 6px; background-color: #0052cc;">Home <i class="bi bi-chevron-right ms-1" style="font-size: 0.75rem;"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 py-4 m-5">
+        <div class="row">
+            
+            <div class="col-lg-9 pe-lg-5">
+                <span class="text-primary fw-medium" style="font-size: 0.8rem;">Getting Started</span>
+                <h1 class="fw-bold text-dark mt-1 mb-3" style="font-size: 2rem;">Welcome to Nocsphere Host</h1>
+                <p class="text-muted mb-4" style="font-size: 0.95rem; line-height: 1.6;">
+                    Your go-to resource for everything about our billing platform, MikroTik router integration, infrastructure, policies, and troubleshooting guides.
+                </p>
+
+                <h2 class="section-title">Welcome</h2>
+                <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;">
+                    Nocsphere is a billing and management platform tailored for MikroTik router management and ISP operations. This knowledge base is your central resource for everything you need to know about our services. Learn how to manage your MikroTik clients, bandwidth, and billing effectively.
+                </p>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-book"></i></div>
+                            <h5 class="card-title">Introduction</h5>
+                            <p class="card-text">Learn about who we are and what we offer.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-cpu"></i></div>
+                            <h5 class="card-title">Hardware Information</h5>
+                            <p class="card-text">Explore the enterprise-grade hardware that powers our infrastructure.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-building-gear"></i></div>
+                            <h5 class="card-title">Datacenter Locations</h5>
+                            <p class="card-text">View our datacenter addresses across the Asia Pacific region.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-shield-check"></i></div>
+                            <h5 class="card-title">DDoS Protection</h5>
+                            <p class="card-text">Understand how we protect your services from attacks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Guides & Troubleshooting</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-router"></i></div>
+                            <h5 class="card-title">Offline Radius Server</h5>
+                            <p class="card-text">Enable offline mode or local backup authentication when the main server loses connection.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-speedometer2"></i></div>
+                            <h5 class="card-title">Performance Issues</h5>
+                            <p class="card-text">Diagnose and resolve high CPU usage, queue latency, and sync problems on MikroTik.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-globe"></i></div>
+                            <h5 class="card-title">Network Problems</h5>
+                            <p class="card-text">Troubleshoot API/SSTP connection loss, high ping, and packet loss issues.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Policies & Legal</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-file-earmark-text"></i></div>
+                            <h5 class="card-title">Terms of Service</h5>
+                            <p class="card-text">Review our legally binding terms and conditions governing service usage.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-person-vcard"></i></div>
+                            <h5 class="card-title">Privacy Policy</h5>
+                            <p class="card-text">Learn how we collect, store, and protect your information.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-file-earmark-check"></i></div>
+                            <h5 class="card-title">Fair Use Policy</h5>
+                            <p class="card-text">Guidelines on acceptable use, API rate limits, and system resource sharing.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-receipt"></i></div>
+                            <h5 class="card-title">Refund Policy</h5>
+                            <p class="card-text">Our policies on refunds, chargebacks, and service cancellation.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card custom-card p-3">
+                            <div class="icon-box"><i class="bi bi-shield-shaded"></i></div>
+                            <h5 class="card-title">Service Level Agreement</h5>
+                            <p class="card-text">Our guarantee on network stability, API uptime, and backend service definitions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Need Help?</h2>
+                <div class="contact-box p-3 d-flex align-items-start justify-content-between">
+                    <div class="d-flex align-items-start">
+                        <div class="text-primary me-3 mt-1" style="font-size: 1.2rem;">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div>
+                            <h6 class="fw-semibold text-dark mb-1" style="font-size: 0.9rem;">Contact Support</h6>
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">Reach out to our support team at <a href="mailto:support@nocsphere.host" class="text-decoration-none fw-medium text-dark border-bottom border-dark">support@nocsphere.host</a> for any questions or assistance.</p>
+                        </div>
+                    </div>
+                    <a href="#" class="text-muted ms-2"><i class="bi bi-arrow-up-right" style="font-size: 0.8rem;"></i></a>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between border-top pt-4 mt-5 mb-4">
+                    <span class="text-muted mb-2 mb-sm-0" style="font-size: 0.85rem;">Was this page helpful?</span>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1" style="font-size: 0.8rem; border-color: #cbd5e1;"><i class="bi bi-hand-thumbs-up"></i> Yes</button>
+                        <button class="btn btn-outline-secondary btn-sm px-3 d-flex align-items-center gap-1" style="font-size: 0.8rem; border-color: #cbd5e1;"><i class="bi bi-hand-thumbs-down"></i> No</button>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end mb-5">
+                    <a href="#" class="text-decoration-none text-muted d-flex align-items-center gap-1" style="font-size: 0.85rem;">
+                        Introduction <i class="bi bi-chevron-right" style="font-size: 0.75rem;"></i>
+                    </a>
+                </div>
+
+                <footer class="d-flex align-items-center justify-content-between border-top pt-3 pb-4">
+                    <div class="footer-social d-flex">
+                        <a href="#"><i class="bi bi-globe"></i></a>
+                        <a href="#"><i class="bi bi-discord"></i></a>
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-youtube"></i></a>
+                    </div>
+                    <span class="text-muted" style="font-size: 0.75rem;">Powered by <a href="#" class="text-decoration-none text-muted fw-semibold">mintlify</a></span>
+                </footer>
+
+            </div>
+
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="sidebar-right ps-3 border-start">
+                    <div class="fw-medium text-dark mb-2 d-flex align-items-center gap-1" style="font-size: 0.8rem; letter-spacing: 0.5px;">
+                        <i class="bi bi-list-nested"></i> On this page
+                    </div>
+                    <ul class="list-unstyled d-flex flex-column gap-2 m-0">
+                        <li><a href="#" class="active">Welcome</a></li>
+                        <li><a href="#">Guides & Troubleshooting</a></li>
+                        <li><a href="#">Policies & Legal</a></li>
+                        <li><a href="#">Need Help?</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
