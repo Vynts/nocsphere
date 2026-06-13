@@ -1,18 +1,20 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 
 class LoginPost(BaseModel):
-    username: str
-    email: str
-    password: str
-    no_hp: str | None = None
+    username: str = Field(..., example="PT-NOCSPHERE")
+    email: str = Field(..., example="nocsphere@gmail.com")
+    password: str = Field(..., example="password123")
+    no_hp: str = Field(None, example="081234567890")
 
 class LoginRequest(BaseModel):
-    email: str
-    password: str 
+    email: str = Field(..., example="nocsphere@gmail.com")
+    password: str = Field(..., example="password123")
 
-class LoginResponse(BaseModel):
+class TokenResponse(BaseModel):
     status: str
     message: str
-    token: str | None = None
-    level: str | None = None
-    redirect_to: str | None = None
+    access_token: str
+    level: str
+    token_type: str = "bearer"
+    redirect_to: str = Field(..., example="/dashboard")
