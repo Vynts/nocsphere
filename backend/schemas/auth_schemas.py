@@ -16,5 +16,6 @@ class TokenResponse(BaseModel):
     message: str
     access_token: str
     level: str
+    tenant: str
     token_type: str = "bearer"
     redirect_to: str = Field(..., example="/dashboard")

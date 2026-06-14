@@ -14,7 +14,7 @@ router = APIRouter(
 async def login(payload: LoginRequest, conn: Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("SELECT id_perusahaan, password, level FROM tbl_user WHERE email = %s", (payload.email,))
+            await cursor.execute("SELECT id_perusahaan, tenant_slug, password, level FROM tbl_user WHERE email = %s", (payload.email,))
             perusahaan = await cursor.fetchone()
 
         if not perusahaan:
@@ -39,6 +39,7 @@ async def login(payload: LoginRequest, conn: Connection = Depends(database_conne
             "access_token" : access_token,
             "token_type": "bearer",
             "level" : perusahaan['level'],
+            "tenant" : perusahaan['tenant_slug'],
             "redirect_to" : "/dashboard"
         }
     

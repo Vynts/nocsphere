@@ -41,11 +41,12 @@ export default function LoginPage() {
 
         // 3. BONGKAR JWT Token untuk mendapatkan 'id_perusahaan'
         const decodedToken = jwtDecode(result.access_token);
-        const idPerusahaan = decodedToken.id_perusahaan; // Mengambil data {"id_perusahaan": id_perusahaan} dari backend
+        const idPerusahaan = decodedToken.id_perusahaan; 
+        const tenantSlug = result.tenant; // Mengambil data {"id_perusahaan": id_perusahaan} dari backend
 
         // 4. Alihkan halaman secara dinamis menggunakan ID Perusahaan di FE!
         // Hasilnya user akan diarahkan ke /dashboard/101, /dashboard/102, dst.
-        router.push(`/dashboard/${idPerusahaan}`);
+        router.push(`/${tenantSlug}/dashboard`);
       }
     } catch (err) {
       setError(err.message);
