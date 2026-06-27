@@ -24,7 +24,7 @@ FROM node:20-alpine AS frontend-base
 FROM frontend-base AS frontend-deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY frontend/package.json frontend/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci
 
 FROM frontend-base AS frontend-builder
