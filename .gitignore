@@ -1,0 +1,24 @@
+# Cache Next.js & Node
+node_modules/
+.next/
+out/
+build/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Environment Variables (Keamanan)
+.env
+.env.local
+.env.production
+
+# Sistem Operasi
+.DS_Store
+Thumbs.db

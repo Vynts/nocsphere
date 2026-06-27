@@ -1,0 +1,6 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+
+router = APIRouter(
+    prefix='/api/invoice',
+    tags=["Invoice"]
+    )
