@@ -24,12 +24,16 @@ FROM node:20-alpine AS frontend-base
 FROM frontend-base AS frontend-deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-COPY package.json package-lock.json* ./
+
+# KARENA CONTEXT DI ROOT: Ambil langsung dari folder frontend/ ke root container
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci
 
 FROM frontend-base AS frontend-builder
 WORKDIR /app
 COPY --from=frontend-deps /app/node_modules ./node_modules
+
+# Salin seluruh isi folder frontend ke dalam /app container
 COPY frontend/ .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
