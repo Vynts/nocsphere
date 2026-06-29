@@ -5,6 +5,30 @@
  *   Website: AdminLTE.io <https://adminlte.io>
  *   License: Open source - MIT <https://opensource.org/licenses/MIT>
  */
+
+ /* src/app/globals.css */
+
+/* Paksa semua elemen menggunakan font Source Sans 3 bawaan AdminLTE */
+body, html {
+  font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+}
+
+/* Meluruskan icon full screen dan menu kanan navbar AdminLTE v4 */
+.app-header .navbar-nav {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important;
+}
+
+.app-header .nav-item .nav-link {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 :root,
 [data-bs-theme="light"] {
   --bs-blue: #0d6efd;
