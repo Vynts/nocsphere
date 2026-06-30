@@ -20,45 +20,6 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const fiturKanan = [
-    {
-      title: "TERPERCAYA DAN TERUJI",
-      desc: "Sudah dipercaya dan digunakan oleh ribuan perusahaan skala kecil dan besar dari seluruh wilayah Indonesia untuk menjaga reliabilitas billing.",
-      icon: "bi-shield-check",
-      color: "#0d6efd",
-    },
-    {
-      title: "RESOURCE MIKROTIK RINGAN",
-      desc: "Karena data tersimpan di Database Cloud Radius, Resources MikroTik Anda menjadi jauh lebih ringan dan memperpanjang umur hardware.",
-      icon: "bi-cpu",
-      color: "#20c997",
-    },
-    {
-      title: "INTEGRASI OLT & ONU",
-      desc: "Fitur Management OLT EPON dan GPON yang terintegrasi langsung dengan aplikasi untuk memantau redaman (optical power) secara realtime.",
-      icon: "bi-diagram-3",
-      color: "#0dcaf0",
-    },
-    {
-      title: "TIKET SUPPORT",
-      desc: "Fitur tiket yang aman memudahkan Anda dalam memantau suatu proses troubleshooting atau kendala teknis tim lapangan.",
-      icon: "bi-ticket-perforated",
-      color: "#ffc107",
-    },
-    {
-      title: "DATA LEBIH AMAN",
-      desc: "Data pelanggan tetap aman ketika mikroTik rusak, cukup hubungkan mikroTik pengganti ke server radius kami tanpa setup ulang.",
-      icon: "bi-database-check",
-      color: "#6f42c1",
-    },
-    {
-      title: "INVOICE OTOMATIS",
-      desc: "Tersedia fitur invoice otomatis dan invoice manual untuk pembuatan billing pelanggan terisolir maupun masa tenggang.",
-      icon: "bi-file-earmark-bar-graph",
-      color: "#fd7e14",
-    },
-  ];
-
   return (
     <>
       {/* HEADER SECTION */}
@@ -90,7 +51,7 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                NocSphere
+                Nocsphere
               </a>
 
               <button
@@ -164,238 +125,189 @@ export default function LandingPage() {
                     backgroundImage: "linear-gradient(45deg, #0d6efd, #0dcaf0)",
                   }}
                 >
-                  Fitur Unggulan Kami
+                  Prioritas Klien & Update Selamanya
                 </span>
               </h1>
               <p className="text-secondary" style={{ maxWidth: "700px" }}>
-                NocSphere menyediakan berbagai fitur canggih untuk memudahkan
-                manajemen jaringan Internet Service Provider Anda.
+                Nocsphere berdedikasi penuh mengoptimalkan manajemen PPPoE
+                MikroTik Anda. Nikmati pembaruan fitur dan performa secara
+                berkala secara otomatis—selalu dengan harga langganan yang tetap
+                sama tanpa biaya tambahan.
               </p>
             </div>
           </div>
         </div>
       </header>
 
-      {/* ================= MAIN CONTENT ================= */}
-      <main className="flex-grow-1 py-5 position-relative">
+      <main className="flex-grow-1 py-5 mt-5 pt-5">
         <div className="container py-4">
-          {/* Judul Atas */}
-          <div className="text-center mb-5 pb-2">
-            <span
-              className="badge text-bg-primary bg-opacity-10 text-primary border border-primary border-opacity-20 rounded-pill px-3 py-1.5 text-uppercase fw-bold mb-3"
-              style={{ fontSize: "11px", letterSpacing: "0.5px" }}
-            >
-              CORE MANAGEMENT SYSTEM
-            </span>
-            <h5
-              className="fw-black fw-bold tracking-wide mb-2"
-              style={{ fontSize: "1.6rem", letterSpacing: "1px" }}
-            >
-              MANAJEMEN UTAMA
-            </h5>
-            <p
-              className="text-secondary small mx-auto"
-              style={{ maxWidth: "550px" }}
-            >
-              Fokus pada efisiensi pengontrolan user PPPoE MikroTik dan
-              otomatisasi billing tanpa membebani resource router Anda.
-            </p>
-            <div
-              className="mx-auto mt-3"
-              style={{
-                width: "40px",
-                height: "3px",
-                backgroundColor: "#0d6efd",
-              }}
-            ></div>
+          {/* LAYOUT SPLIT: Komitmen Klien vs Core Fitur */}
+          <div className="row g-5 align-items-center">
+            {/* SISI KIRI: Komitmen & Prioritas Utama (Teks Besar & Padat) */}
+            <div className="col-12 col-lg-6">
+              <span
+                className="text-primary fw-bold text-uppercase d-block mb-2"
+                style={{ fontSize: "12px", letterSpacing: "1.5px" }}
+              >
+                KAMI MENDENGAR ANDA
+              </span>
+              <h1
+                className="fw-bold mb-4"
+                style={{
+                  fontSize: "2.5rem",
+                  lineHeight: "1.2",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Klien Selalu Prioritas,
+                <br />
+                Update Terus Tanpa Biaya Tambahan
+              </h1>
+              <p
+                className="text-secondary mb-3"
+                style={{ fontSize: "15px", lineHeight: "1.6" }}
+              >
+                Di Nocsphere, kenyamanan dan stabilitas bisnis RT/RW Net atau
+                ISP Anda adalah prioritas nomor satu kami. Kami terus melakukan
+                pengembangan, perbaikan performa, dan penambahan fitur-fitur
+                baru secara berkala untuk memastikan integrasi PPPoE Anda selalu
+                berjalan optimal mengikuti perkembangan teknologi RouterOS.
+              </p>
+              <p
+                className="text-secondary"
+                style={{ fontSize: "15px", lineHeight: "1.6" }}
+              >
+                Kabar terbaiknya? Anda tidak perlu mengkhawatirkan biaya
+                tambahan di masa depan. Cukup berlangganan dengan{" "}
+                <strong>harga tetap yang sama</strong>, dan Anda otomatis
+                langsung menikmati seluruh update sistem terbaru kami tanpa
+                biaya *upgrade* tersembunyi apa pun.
+              </p>
+            </div>
+
+            {/* SISI KANAN: Grid Core Fitur PPPoE Management */}
+            <div className="col-12 col-lg-6">
+              <div className="row g-3">
+                {/* Fitur 1 */}
+                <div className="col-12 col-sm-6">
+                  <div
+                    className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100"
+                    style={{ backgroundColor: "#0b1120" }}
+                  >
+                    <div className="text-primary mb-3">
+                      <i className="bi bi-rocket-takeoff fs-3"></i>
+                    </div>
+                    <h5
+                      className="fw-bold text-white mb-2"
+                      style={{ fontSize: "16px" }}
+                    >
+                      Ultra-Low API Load
+                    </h5>
+                    <p
+                      className="text-secondary small mb-0"
+                      style={{ fontSize: "12.5px", lineHeight: "1.5" }}
+                    >
+                      Arsitektur optimasi query data menjaga kestabilan resource
+                      CPU router MikroTik Anda tetap ringan.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Fitur 2 */}
+                <div className="col-12 col-sm-6">
+                  <div
+                    className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100"
+                    style={{ backgroundColor: "#0b1120" }}
+                  >
+                    <div className="text-primary mb-3">
+                      <i className="bi bi-shield-lock fs-3"></i>
+                    </div>
+                    <h5
+                      className="fw-bold text-white mb-2"
+                      style={{ fontSize: "16px" }}
+                    >
+                      Isolir Otomatis Real-Time
+                    </h5>
+                    <p
+                      className="text-secondary small mb-0"
+                      style={{ fontSize: "12.5px", lineHeight: "1.5" }}
+                    >
+                      Memindahkan profil secret pelanggan PPPoE yang menunggak
+                      ke mode terisolir tepat waktu secara otomatis.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Fitur 3 */}
+                <div className="col-12 col-sm-6">
+                  <div
+                    className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100"
+                    style={{ backgroundColor: "#0b1120" }}
+                  >
+                    <div className="text-primary mb-3">
+                      <i className="bi bi-lightning-charge fs-3"></i>
+                    </div>
+                    <h5
+                      className="fw-bold text-white mb-2"
+                      style={{ fontSize: "16px" }}
+                    >
+                      Buka Isolir Instan
+                    </h5>
+                    <p
+                      className="text-secondary small mb-0"
+                      style={{ fontSize: "12.5px", lineHeight: "1.5" }}
+                    >
+                      Integrasi payment gateway membuat status isolir terlepas
+                      sedetik setelah pembayaran QRIS/VA sukses.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Fitur 4 */}
+                <div className="col-12 col-sm-6">
+                  <div
+                    className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100"
+                    style={{ backgroundColor: "#0b1120" }}
+                  >
+                    <div className="text-primary mb-3">
+                      <i className="bi bi-whatsapp fs-3"></i>
+                    </div>
+                    <h5
+                      className="fw-bold text-white mb-2"
+                      style={{ fontSize: "16px" }}
+                    >
+                      WhatsApp Reminder
+                    </h5>
+                    <p
+                      className="text-secondary small mb-0"
+                      style={{ fontSize: "12.5px", lineHeight: "1.5" }}
+                    >
+                      Notifikasi invoice otomatis langsung terkirim ke chat
+                      pelanggan sebelum masa jatuh tempo tiba.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Layout Baru: Grid Card Modern (3 Kolom Sejajar) */}
-          <div className="row g-4 justify-content-center">
-            {/* Card Fitur 1 */}
-            <div className="col-12 col-md-6 col-lg-4">
+          {/* ================= SECTION: VIDEO DEMO (UKURAN BESAR) ================= */}
+          <div className="row justify-content-center mt-5 pt-4">
+            <div className="col-12 col-md-12 col-lg-12">
               <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 h-100 d-flex flex-column"
+                className="ratio ratio-16x9 overflow-hidden shadow-lg"
                 style={{
-                  backgroundColor: "rgba(11, 17, 32)",
-                  backdropFilter: "blur(8px)",
+                  borderRadius: "16px",
+                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.5)",
                 }}
               >
-                <div className="d-flex align-items-center gap-3 mb-3">
-                  <i
-                    className="bi bi-cpu-fill fs-5"
-                    style={{ color: "#0d6efd" }}
-                  ></i>
-
-                  <h5 className="fw-bold mb-0 text-white fs-6 tracking-wide">
-                    OPTIMASI API LOAD MINIM
-                  </h5>
-                </div>
-                <p className="text-secondary small mb-0 lh-base">
-                  Arsitektur core kami didesain khusus melakukan caching query
-                  data penagihan. Sinkronisasi berkala menjaga CPU load MikroTik
-                  Anda tetap rendah dan stabil walau mengelola ribuan secret
-                  PPPoE aktif.
-                </p>
-              </div>
-            </div>
-
-            {/* Card Fitur 2 */}
-            <div className="col-12 col-md-6 col-lg-4">
-              <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 h-100 d-flex flex-column"
-                style={{
-                  backgroundColor: "rgba(11, 17, 32)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3 mb-3">
-                  <i
-                    className="bi bi-shield-lock-fill fs-5"
-                    style={{ color: "#dc3545" }}
-                  ></i>
-                  <h5 className="fw-bold mb-0 text-white fs-6 tracking-wide">
-                    ISOLIR OTOMATIS REAL-TIME
-                  </h5>
-                </div>
-                <p className="text-secondary small mb-0 lh-base">
-                  Sistem billing otomatis memantau masa aktif profile PPPoE
-                  pelanggan. Ketika melewati tanggal jatuh tempo, user langsung
-                  dialihkan ke profile isolir secara otomatis saat itu juga
-                  tanpa lag penundaan.
-                </p>
-              </div>
-            </div>
-
-            {/* Card Fitur 3 */}
-            <div className="col-12 col-md-6 col-lg-4">
-              <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 h-100 d-flex flex-column"
-                style={{
-                  backgroundColor: "rgba(11, 17, 32)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <div className="d-flex align-items-center gap-3 mb-3">
-                  <i
-                    className="bi bi-lightning-charge-fill fs-5"
-                    style={{ color: "#20c997" }}
-                  ></i>
-                  <h5 className="fw-bold mb-0 text-white fs-6 tracking-wide">
-                    OPEN ISOLIR INSTAN VIA VA/QRIS
-                  </h5>
-                </div>
-                <p className="text-secondary small mb-0 lh-base">
-                  Terintegrasi penuh dengan payment gateway otomatis. Begitu
-                  pembayaran Virtual Account atau QRIS selesai, sistem langsung
-                  melepas status isolir dan mengembalikan profile PPPoE
-                  pelanggan ke normal.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* ================= FASILITAS PENDUKUNG INTEGRASI ================= */}
-          <div className="text-center mt-5 pt-5 mb-4">
-            <h2 className="fw-bold fw-bold mb-2" style={{ fontSize: "1.6rem" }}>
-              INFRASTRUKTUR UTAMA
-            </h2>
-            <div
-              className="mx-auto mt-2"
-              style={{
-                width: "40px",
-                height: "2px",
-                backgroundColor: "#0d6efd",
-              }}
-            ></div>
-          </div>
-
-          <div className="row g-4 justify-content-center">
-            <div className="col-12 col-md-4">
-              <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 text-center h-100"
-                style={{ backgroundColor: "rgba(11, 17, 32)" }}
-              >
-                <div
-                  className="mx-auto p-3 rounded-circle d-flex align-items-center justify-content-center mb-3"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    backgroundColor: "rgba(255,255,255,0.04)",
-                  }}
-                >
-                  <i className="bi bi-hdd-network text-white fs-4"></i>
-                </div>
-                <h5 className="fw-bold text-white mb-2 fs-6">
-                  SINKRONISASI CLOUD SECURE
-                </h5>
-                <p
-                  className="text-secondary small mb-0"
-                  style={{ fontSize: "12px" }}
-                >
-                  Menghubungkan remote API MikroTik Anda secara aman menggunakan
-                  protokol enkripsi cloud radius standar enterprise.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 text-center h-100"
-                style={{ backgroundColor: "rgba(11, 17, 32)" }}
-              >
-                <div
-                  className="mx-auto p-3 rounded-circle d-flex align-items-center justify-content-center mb-3"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    backgroundColor: "rgba(255,255,255,0.04)",
-                  }}
-                >
-                  <i className="bi bi-whatsapp text-white fs-4"></i>
-                </div>
-                <h5 className="fw-bold text-white mb-2 fs-6">
-                  NOTIFIKASI REMINDER WHATSAPP
-                </h5>
-                <p
-                  className="text-secondary small mb-0"
-                  style={{ fontSize: "12px" }}
-                >
-                  Mengirimkan rincian tagihan invoice bulanan dan peringatan
-                  isolir otomatis langsung ke chat nomor WhatsApp pelanggan.
-                </p>
-              </div>
-            </div>
-
-            <div className="col-12 col-md-4">
-              <div
-                className="p-4 rounded-4 border border-secondary border-opacity-10 text-center h-100"
-                style={{
-                  backgroundColor: "rgba(11, 17, 32)",
-                  borderColor: "rgba(13, 110, 253, 0.2)",
-                }}
-              >
-                <div
-                  className="mx-auto p-3 rounded-circle d-flex align-items-center justify-content-center mb-3"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    backgroundColor: "rgba(13, 110, 253, 0.15)",
-                  }}
-                >
-                  <i className="bi bi-arrow-clockwise text-primary fs-4"></i>
-                </div>
-                <h5 className="fw-bold text-white mb-2 fs-6">
-                  BACKUP DATA USER PPPoE
-                </h5>
-                <p
-                  className="text-secondary small mb-0"
-                  style={{ fontSize: "12px" }}
-                >
-                  Data profil billing dan list secret pelanggan tersimpan di
-                  database eksternal kami secara berkala, aman dari resiko
-                  router rusak.
-                </p>
+                <iframe
+                  src="https://www.youtube.com/embed/OlmuFRINnGg?si=1tWbuOW5gLYweetD"
+                  title="NocsphereDemo Video"
+                  allowFullScreen
+                  style={{ borderRadius: "16px" }}
+                ></iframe>
               </div>
             </div>
           </div>
@@ -431,11 +343,11 @@ export default function LandingPage() {
                 className="text-white-50 small lh-lg mb-3"
                 style={{ maxWidth: "350px" }}
               >
-                NocSphere provides high-performing billing management systems
+                Nocsphereprovides high-performing billing management systems
                 with unmatched reliability and automated isolation features.
               </p>
               <p className="fw-bold small mb-1">
-                PT NocSphere Inovasi Teknologi
+                PT Nocsphere Inovasi Teknologi
               </p>
               <p className="text-white-50 small mb-3">
                 Serving the best web billing management community

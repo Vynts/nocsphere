@@ -51,7 +51,7 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                NocSphere
+                Nocsphere
               </a>
 
               <button
@@ -130,7 +130,7 @@ export default function LandingPage() {
                 </span>
               </h1>
               <p className="text-secondary" style={{ maxWidth: "700px" }}>
-                NocSphere lahir sebagai solusi otomasi billing berkinerja
+                Nocsphere lahir sebagai solusi otomasi billing berkinerja
                 tinggi, menjembatani kendali infrastruktur jaringan MikroTik
                 berskala besar dengan fleksibilitas integrasi modern.
               </p>
@@ -182,7 +182,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Lite
+                  Nocsphere Lite <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -249,6 +249,10 @@ export default function LandingPage() {
                     Manajemen Invoice
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
                     <i className="bi bi-x-lg"></i> Bot Telegram
                   </li>
                 </ul>
@@ -291,7 +295,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Enterprise
+                  Nocsphere Enterprise <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -359,6 +363,10 @@ export default function LandingPage() {
                     Manajemen Invoice
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
                     <i className="bi bi-check-circle-fill text-primary"></i> Bot
                     Telegram
                   </li>
@@ -386,7 +394,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Local
+                  Nocsphere Local <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -452,6 +460,10 @@ export default function LandingPage() {
                     Manajemen Invoice
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
                     <i className="bi bi-check-circle-fill text-primary"></i> Bot
                     Telegram
                   </li>
@@ -483,7 +495,7 @@ export default function LandingPage() {
       {/* WATERMARK SECTION */}
       <section className="footer-watermark-container bg-dark-custom py-5">
         <div className="py-4">
-          <div className="footer-watermark-text text-nowrap">nocsphere</div>
+          <div className="footer-watermark-text text-nowrap">Nocsphere</div>
         </div>
       </section>
 
@@ -503,17 +515,17 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-2"></i>{" "}
-                NocSphere
+                Nocsphere
               </a>
               <p
                 className="text-white-50 small lh-lg mb-3"
                 style={{ maxWidth: "350px" }}
               >
-                NocSphere provides high-performing billing management systems
+                Nocsphere provides high-performing billing management systems
                 with unmatched reliability and automated isolation features.
               </p>
               <p className="fw-bold small mb-1">
-                PT NocSphere Inovasi Teknologi
+                PT NocsphereInovasi Teknologi
               </p>
               <p className="text-white-50 small mb-3">
                 Serving the best web billing management community

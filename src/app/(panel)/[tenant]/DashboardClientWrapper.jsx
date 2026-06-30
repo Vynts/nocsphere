@@ -393,8 +393,8 @@ export default function DashboardClientWrapper({ children }) {
 
               <li className="nav-item">
                 <a href="../pages/invoice.html" className="nav-link">
-                  <i className="nav-icon bi bi-chat-dots"></i>
-                  <p className="fw-bold">EVoucher Bot</p>
+                  <i className="nav-icon bi bi-telegram"></i>
+                  <p className="fw-bold">Telegram Bot</p>
                 </a>
               </li>
             </ul>

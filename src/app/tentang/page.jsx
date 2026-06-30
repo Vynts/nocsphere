@@ -51,7 +51,7 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                NocSphere
+                Nocsphere  
               </a>
 
               <button
@@ -130,7 +130,7 @@ export default function LandingPage() {
                 </span>
               </h1>
               <p className="text-secondary" style={{ maxWidth: "700px" }}>
-                NocSphere lahir sebagai solusi otomasi billing berkinerja
+                Nocsphere  lahir sebagai solusi otomasi billing berkinerja
                 tinggi, menjembatani kendali infrastruktur jaringan MikroTik
                 berskala besar dengan fleksibilitas integrasi modern.
               </p>
@@ -151,7 +151,7 @@ export default function LandingPage() {
             <p className="text-secondary">
               Kami memahami tantangan ISP, RT/RW Net, dan jaringan korporasi
               dalam mengelola ribuan akun PPPoE dan Hotspot secara simultan.
-              NocSphere dikembangkan secara spesifik untuk meminimalkan beban
+              Nocsphere   dikembangkan secara spesifik untuk meminimalkan beban
               query API pada RouterOS Anda menggunakan arsitektur caching data
               yang efisien dan andal.
             </p>
@@ -207,13 +207,13 @@ export default function LandingPage() {
             <span className="text-primary text-uppercase small fw-bold tracking-wider">
               The Team
             </span>
-            <h2 className="fw-bold mt-1">Behind NocSphere</h2>
+            <h2 className="fw-bold mt-1">Behind Nocsphere  </h2>
           </div>
 
           <div className="row g-4 justify-content-center">
             {/* Alvinza Erza Faradhika */}
             <div className="col-md-6 col-lg-5">
-              <div className="p-4 rounded-4 border border-secondary border-opacity-10 h-100 transition-all shadow-sm">
+              <div className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100 transition-all shadow-sm">
                 <div className="d-flex justify-content-between align-items-start mb-3">
                   <div>
                     <h4 className="fw-bold mb-1">Alvinza Erza Farandhika</h4>
@@ -252,7 +252,7 @@ export default function LandingPage() {
 
             {/* Rufi Tomisila */}
             <div className="col-md-6 col-lg-5">
-              <div className="p-4 rounded-4 border border-secondary border-opacity-10 h-100 transition-all shadow-sm">
+              <div className="product-card p-4 rounded-4 border border-secondary border-opacity-10 h-100 transition-all shadow-sm">
                 <div className="d-flex justify-content-between align-items-start mb-3">
                   <div>
                     <h4 className="fw-bold mb-1">Rufi Tomisila</h4>
@@ -291,7 +291,7 @@ export default function LandingPage() {
       {/* WATERMARK SECTION */}
       <section className="footer-watermark-container bg-dark-custom py-5">
         <div className="py-4">
-          <div className="footer-watermark-text text-nowrap">nocsphere</div>
+          <div className="footer-watermark-text text-nowrap">Nocsphere  </div>
         </div>
       </section>
 
@@ -311,17 +311,17 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-2"></i>{" "}
-                NocSphere
+                Nocsphere  
               </a>
               <p
                 className="text-white-50 small lh-lg mb-3"
                 style={{ maxWidth: "350px" }}
               >
-                NocSphere provides high-performing billing management systems
+                Nocsphere  provides high-performing billing management systems
                 with unmatched reliability and automated isolation features.
               </p>
               <p className="fw-bold small mb-1">
-                PT NocSphere Inovasi Teknologi
+                PT Nocsphere  Inovasi Teknologi
               </p>
               <p className="text-white-50 small mb-3">
                 Serving the best web billing management community
@@ -420,7 +420,7 @@ export default function LandingPage() {
             style={{ zIndex: 2 }}
           >
             <span className="text-white-50 small">
-              &copy; 2026 NocSphere. All rights reserved.
+              &copy; 2026 Nocsphere  . All rights reserved.
             </span>
             <div className="d-flex gap-3 fs-5 social-links">
               <a href="#">

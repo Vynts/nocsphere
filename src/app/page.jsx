@@ -51,7 +51,7 @@ export default function LandingPage() {
                 href="#"
               >
                 <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                NocSphere
+                Nocsphere
               </a>
 
               <button
@@ -118,8 +118,8 @@ export default function LandingPage() {
 
           <div className="row py-5 my-5 justify-content-center text-center">
             <div className="col-lg-9 my-3">
-              <h1 className="display-4 d-flex flex-column hero-title fw-bold mb-3">
-                Best Solution for{" "}
+              <h1 className="display-4 d-flex flex-column hero-title fw-bold mb-3" style={{ fontSize: "65px" }}>
+                Best Solution for
                 <span className="text-white-50">Your MikroTik Business</span>
               </h1>
               <p
@@ -174,36 +174,14 @@ export default function LandingPage() {
       </header>
 
       {/* SOLUTIONS SECTION */}
-      <section
-        className="py-5 position-relative"
-      >
+      <section className="py-5 position-relative">
         <div className="container py-4">
           {/* Judul Atas */}
           <div className="text-center mb-5">
-            <span
-              className="text-primary fw-bold text-uppercase d-block mb-2"
-              style={{ fontSize: "11px", letterSpacing: "1px" }}
-            >
+            <span className="text-uppercase text-muted tracking-wider small fw-bold">
               SOLUTIONS
             </span>
-            <h2
-              className="fw-bold mb-2"
-              style={{ fontSize: "2.2rem" }}
-            >
-              Our Billing Management
-            </h2>
-            <p className="text-secondary small">
-              Pilih paket langganan cloud radius terbaik yang sesuai dengan
-              skala jaringan PPPoE Anda.
-            </p>
-            <div
-              className="mx-auto mt-3"
-              style={{
-                width: "40px",
-                height: "3px",
-                backgroundColor: "#0d6efd",
-              }}
-            ></div>
+            <h2 className="fw-bold mt-1">Our Billing Pricelist</h2>
           </div>
 
           {/* Grid Paket 3 Kolom Semetris */}
@@ -221,7 +199,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Lite
+                  Nocsphere Lite <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -245,37 +223,51 @@ export default function LandingPage() {
                   style={{ fontSize: "13.5px" }}
                 >
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> 3 Router Mikrotik
+                    <i className="bi bi-check-circle-fill text-primary"></i> 3
+                    Router Mikrotik
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> 1.500 Secret
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    1.500 Secret
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
                     <i className="bi bi-x-lg"></i> Free VPN
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Network Maps
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Network Maps
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Sistem Isolasi Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Sistem Isolasi Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Notifikasi Whatsapp
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Notifikasi Whatsapp
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Payment Gateway Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Payment Gateway Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Portal Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Portal Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Customer
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Customer
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Invoice
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Invoice
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
                     <i className="bi bi-x-lg"></i> Bot Telegram
@@ -320,7 +312,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Enterprise
+                  Nocsphere Enterprise <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -344,40 +336,56 @@ export default function LandingPage() {
                   style={{ fontSize: "13.5px" }}
                 >
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> 5 Router Mikrotik
+                    <i className="bi bi-check-circle-fill text-primary"></i> 5
+                    Router Mikrotik
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> 2.500 Secrets
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    5.000 Secrets
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Free VPN
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Free VPN
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Network Maps
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Network Maps
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Sistem Isolasi Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Sistem Isolasi Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Notifikasi Whatsapp
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Notifikasi Whatsapp
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Payment Gateway Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Payment Gateway Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Portal Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Portal Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Customer
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Customer
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Invoice
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Invoice
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Bot Telegram
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i> Bot
+                    Telegram
                   </li>
                 </ul>
 
@@ -403,7 +411,7 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Local
+                  Nocsphere Local <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -413,12 +421,11 @@ export default function LandingPage() {
                   className="fw-black text-white mb-4"
                   style={{ fontSize: "2rem" }}
                 >
-                  Rp 3.500.000{" "}
+                  Rp 3.500.000 <br />
                   <span
                     className="text-secondary fw-normal"
                     style={{ fontSize: "13px" }}
-                  >
-                  </span>
+                  >Instalasi nocpshere di Server Lokal</span>
                 </h3>
 
                 <ul
@@ -426,46 +433,64 @@ export default function LandingPage() {
                   style={{ fontSize: "13.5px" }}
                 >
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Unlimited Mikrotik
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Unlimited Mikrotik
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Unlimited Secrets
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Unlimited Secrets
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> VPN Local
+                    <i className="bi bi-check-circle-fill text-primary"></i> VPN
+                    Local
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Network Maps
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Network Maps
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Sistem Isolasi Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Sistem Isolasi Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Notifikasi Whatsapp
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Notifikasi Whatsapp
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Payment Gateway Otomatis
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Payment Gateway Otomatis
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Portal Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Portal Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Member
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Member
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Customer
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Customer
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Manajemen Invoice
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen Invoice
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Bot Telegram
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Manajemen PPPoE
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Custom Logo
+                    <i className="bi bi-check-circle-fill text-primary"></i> Bot
+                    Telegram
                   </li>
                   <li className="text-secondary d-flex align-items-center gap-2 my-1">
-                    <i className="bi bi-check-circle-fill text-primary"></i> Maintenance
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Custom Logo
+                  </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Maintenance
                   </li>
                 </ul>
 
