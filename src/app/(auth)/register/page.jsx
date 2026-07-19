@@ -1,4 +1,3 @@
-// src/app/(auth)/register/page.js
 "use client";
 
 import React, { useState } from "react";
@@ -6,400 +5,264 @@ import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    phone: "",
-    address: "",
-    password: "",
-    confirmPassword: "",
-  });
+
+  // State Input Form
+  const [fullName, setFullName] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // State Status & Error
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
+  // Jalur Handler Daftar (Register) Tenant/Perusahaan Baru
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccessMessage("");
 
-    // Validasi Kecocokan Password
-    if (formData.password !== formData.confirmPassword) {
-      setError("Konfirmasi password tidak cocok!");
+    // Membuat slug URL otomatis dari nama perusahaan
+    // Contoh: "Rhantech Media Net" -> "rhantech-media-net"
+    const tenantSlug = companyName
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Hapus karakter non-alphanumeric kecuali spasi dan strip
+      .replace(/[\s_-]+/g, '-')  // Ganti spasi atau underscore menjadi satu strip
+      .replace(/^-+|-+$/g, '');  // Hapus strip di awal atau akhir kalimat
+
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          full_name: fullName, 
+          company_name: companyName,
+          tenant_slug: tenantSlug, // Mengirimkan slug unik untuk routing dinamis perusahaan
+          email: email, 
+          password: password 
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.detail || "Gagal melakukan registrasi perusahaan baru.");
+      }
+
+      setSuccessMessage(`Perusahaan ${companyName} berhasil didaftarkan! Mengalihkan...`);
+      
+      // Reset form register
+      setFullName("");
+      setCompanyName("");
+      setEmail("");
+      setPassword("");
+
+      // Alihkan ke halaman login setelah 2 detik sukses
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
+
+    } catch (err) {
+      setError(err.message);
       setLoading(false);
-      return;
     }
-
-    // Simulasi Berhasil Registrasi
-    setTimeout(() => {
-      router.push("/login");
-    }, 1500);
   };
 
   return (
     <div
       className="d-flex align-items-center justify-content-center min-vh-100"
       style={{
-        background: "linear-gradient(135deg, #060913 0%, #0b1120 100%)",
+        background: "linear-gradient(135deg, #0f172a 0%, #020617 100%)",
         padding: "20px",
-        fontFamily: "'Inter', sans-serif",
       }}
     >
-      {/* Container Utama Main Card (Split Layout) */}
       <div
-        className="card border-0 shadow-lg overflow-hidden position-relative"
+        className="card border-0 shadow-lg overflow-hidden"
         style={{
-          maxWidth: "980px",
+          maxWidth: "1000px",
           width: "100%",
-          borderRadius: "20px",
+          borderRadius: "16px",
           backgroundColor: "#ffffff",
         }}
       >
-        {/* Tombol Close Pojok Kanan Atas */}
-        <button
-          className="btn-close position-absolute"
-          type="button"
-          style={{ right: "20px", top: "20px", zIndex: 10 }}
-          aria-label="Close"
-        ></button>
-
         <div className="row g-0">
-          {/* ================= SISI KIRI: BANNER BRANDING (HITAM-BIRU) ================= */}
-          <div
-            className="col-lg-5 d-none d-lg-flex flex-column justify-content-between p-5 text-white position-relative"
+          
+          {/* ================= SISI KIRI: VISUAL LAYOUT ART (CLEAN SOLID) ================= */}
+          <div 
+            className="col-lg-6 d-none d-lg-flex flex-column justify-content-between p-5 text-white position-relative"
             style={{
-              background: "linear-gradient(135deg, #0b1528 0%, #050811 100%)",
-              overflow: "hidden",
+              background: "linear-gradient(145deg, #1e3a8a 0%, #0f172a 100%)",
+              minHeight: "600px"
             }}
           >
-            {/* Efek Cetakan Geometris Abstrak Biru Di Latar Belakang */}
-            <div
-              className="position-absolute"
-              style={{
-                top: "-10%",
-                left: "-10%",
-                width: "120%",
-                height: "120%",
-                opacity: 0.12,
-                pointerEvents: "none",
-                background:
-                  "repeating-linear-gradient(45deg, #0d6efd 0px, #0d6efd 40px, transparent 40px, transparent 80px)",
-              }}
-            ></div>
-            <div
-              className="position-absolute rounded-circle"
-              style={{
-                width: "350px",
-                height: "350px",
-                background:
-                  "radial-gradient(circle, #0d6efd 0%, transparent 70%)",
-                top: "20%",
-                left: "-15%",
-                opacity: 0.25,
-                filter: "blur(50px)",
-              }}
-            ></div>
-
-            {/* Konten Atas: Brand Name Kecil */}
-            <div className="position-relative" style={{ zIndex: 2 }}>
-              <span
-                className="fw-bold tracking-wider small text-uppercase text-primary"
-                style={{ letterSpacing: "1.5px" }}
-              >
-                NocSphere Panel
-              </span>
+            {/* Logo Brand */}
+            <div className="d-flex align-items-center gap-2 position-relative z-1">
+              <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="150" />
             </div>
 
-            {/* Konten Tengah: Logomark Besar & Deskripsi */}
-            <div
-              className="my-auto position-relative text-center"
-              style={{ zIndex: 2 }}
-            >
-              <div
-                className="mb-4 d-flex justify-content-center align-items-center mx-auto"
-                style={{
-                  width: "90px",
-                  height: "90px",
-                  borderRadius: "24px",
-                  background: "rgba(13, 110, 253, 0.1)",
-                  border: "1px solid rgba(13, 110, 253, 0.25)",
-                  boxShadow: "0 0 30px rgba(13, 110, 253, 0.2)",
-                }}
-              >
-                <i
-                  className="bi bi-hexagon-fill text-primary"
-                  style={{
-                    fontSize: "42px",
-                    filter: "drop-shadow(0 0 10px #0d6efd)",
-                  }}
-                ></i>
-              </div>
-              <h3 className="fw-bold mb-2" style={{ letterSpacing: "-0.5px" }}>
-                Start Your Journey
-              </h3>
-              <p
-                className="text-white-50 small mx-auto mb-4"
-                style={{ maxWidth: "280px", lineHeight: "1.6" }}
-              >
-                Automate your entire MikroTik billing systems and ISP
-                configurations under one secure network.
+            {/* Headline Tengah */}
+            <div className="my-auto position-relative z-1">
+              <h1 className="fw-extrabold mb-3 display-6 text-white" style={{ letterSpacing: "-1px" }}>
+                Cloud Radius & <br/>Smart Billing Platform.
+              </h1>
+              <p className="text-white-50 lead fs-6" style={{ maxWidth: "380px", lineHeight: "1.6" }}>
+                Kelola infrastruktur PPPoE, monitoring interkoneksi API MikroTik, dan otomatisasi isolir jaringan dalam satu panel terpusat.
               </p>
             </div>
 
-            {/* Konten Bawah: Copyright */}
-            <div className="position-relative" style={{ zIndex: 2 }}>
-              <span className="text-white-50" style={{ fontSize: "11px" }}>
-                &copy; 2026 PT NocSphere Inovasi Teknologi
-              </span>
+            {/* Footer Hak Cipta */}
+            <div className="text-white-50 small position-relative z-1">
+              &copy; {new Date().getFullYear()} NocSphere. All rights reserved.
             </div>
           </div>
 
-          {/* ================= SISI KANAN: FORM REGISTRASI ================= */}
-          <div
-            className="col-lg-7 col-12 p-4 p-sm-5 d-flex flex-column justify-content-center"
-            style={{
-              background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
-            }}
-          >
-            {/* Tampilan Header Logo khusus Mobile */}
-            <div className="d-lg-none text-center mb-4">
-              <div
-                className="mb-2 d-flex justify-content-center align-items-center mx-auto"
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  borderRadius: "12px",
-                  background: "rgba(13, 110, 253, 0.08)",
-                }}
-              >
-                <i
-                  className="bi bi-hexagon-fill text-primary"
-                  style={{ fontSize: "24px" }}
-                ></i>
+          {/* ================= SISI KANAN: FORM REGISTER ================= */}
+          <div className="col-lg-6 d-flex align-items-center bg-white">
+            <div className="card-body p-4 p-sm-5 mx-md-3">
+              
+              {/* Logo khusus tampilan Mobile / HP */}
+              <div className="d-flex d-lg-none align-items-center gap-2 mb-4 text-primary">
+                <i className="bi bi-hexagon-fill fs-4"></i>
+                <span className="fw-bold text-dark">NocSphere</span>
               </div>
-              <h4 className="fw-bold text-dark mb-1">NocSphere</h4>
-              <p className="text-muted small mb-0">
-                Billing & Network Management
-              </p>
-            </div>
 
-            <div className="mx-auto w-100" style={{ maxWidth: "440px" }}>
-              {/* Judul Utama */}
-              <h2
-                className="fw-bold text-dark mb-1"
-                style={{ fontSize: "32px", letterSpacing: "-0.5px" }}
-              >
-                Register
-              </h2>
-              <p className="text-muted small mb-4">
-                Daftarkan bisnis ISP atau jaringan RT/RW Net Anda sekarang.
-              </p>
-
-              {/* Notifikasi Error */}
+              {/* Status Alert */}
               {error && (
-                <div
-                  className="alert alert-danger d-flex align-items-center small py-2.5 border-0 rounded-3 mb-4"
-                  role="alert"
-                  style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}
-                >
-                  <i className="bi bi-exclamation-triangle-fill me-2 fs-6"></i>
-                  <div className="fw-medium">{error}</div>
+                <div className="alert alert-danger small py-2.5 border-0 rounded-3 mb-4 d-flex align-items-center gap-2" style={{ backgroundColor: "#fef2f2", color: "#dc2626" }}>
+                  <i className="bi bi-exclamation-triangle-fill fs-6"></i>
+                  <div>{error}</div>
+                </div>
+              )}
+              {successMessage && (
+                <div className="alert alert-success small py-2.5 border-0 rounded-3 mb-4 d-flex align-items-center gap-2" style={{ backgroundColor: "#f0fdf4", color: "#16a34a" }}>
+                  <i className="bi bi-check-circle-fill fs-6"></i>
+                  <div>{successMessage}</div>
                 </div>
               )}
 
-              {/* Form Input */}
+              <h2 className="fw-bold text-dark mb-1" style={{ fontSize: "28px", letterSpacing: "-0.5px" }}>Daftar Akun Baru</h2>
+              <p className="text-muted small mb-4">Mulai kelola billing infrastruktur RT/RW Net & ISP Anda sekarang.</p>
+
               <form onSubmit={handleRegister}>
-                <div className="row g-2">
-                  {/* Input Username */}
-                  <div className="col-sm-6 col-12 mb-2">
+                {/* Input Nama Lengkap */}
+                <div className="mb-3">
+                  <label className="form-label text-dark fw-medium small mb-1.5">Nama Lengkap</label>
+                  <div className="position-relative d-flex align-items-center">
+                    <i className="bi bi-person position-absolute text-muted start-0 ms-3"></i>
                     <input
                       type="text"
-                      name="username"
-                      className="form-control px-3 text-white fw-medium shadow-sm"
-                      placeholder="Username"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        height: "46px",
-                        borderRadius: "8px",
-                      }}
-                      value={formData.username}
-                      onChange={handleChange}
+                      className="form-control"
+                      placeholder="Masukkan nama lengkap Anda"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       required
                     />
                   </div>
+                </div>
 
-                  {/* Input Email */}
-                  <div className="col-sm-6 col-12 mb-2">
+                {/* Input Nama Perusahaan */}
+                <div className="mb-3">
+                  <label className="form-label text-dark fw-medium small mb-1.5">Nama Perusahaan / Brand ISP</label>
+                  <div className="position-relative d-flex align-items-center">
+                    <i className="bi bi-building position-absolute text-muted start-0 ms-3"></i>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Contoh: Rhantech Media Net"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Input Email */}
+                <div className="mb-3">
+                  <label className="form-label text-dark fw-medium small mb-1.5">Alamat Email Aktif</label>
+                  <div className="position-relative d-flex align-items-center">
+                    <i className="bi bi-envelope position-absolute text-muted start-0 ms-3"></i>
                     <input
                       type="email"
-                      name="email"
-                      className="form-control px-3 text-white fw-medium shadow-sm"
-                      placeholder="Alamat Email"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        height: "46px",
-                        borderRadius: "8px",
-                      }}
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Input Kontak (WhatsApp) */}
-                  <div className="col-12 mb-2">
-                    <input
-                      type="tel"
-                      name="phone"
-                      className="form-control px-3 text-white fw-medium shadow-sm"
-                      placeholder="Nomor Kontak / WhatsApp (e.g. 081234xxx)"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        height: "46px",
-                        borderRadius: "8px",
-                      }}
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Input Alamat Lengkap */}
-                  <div className="col-12 mb-2">
-                    <textarea
-                      name="address"
-                      className="form-control px-3 pt-2.5 text-white fw-medium shadow-sm"
-                      placeholder="Alamat Bisnis / Lokasi ISP"
-                      rows="2"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        borderRadius: "8px",
-                        resize: "none",
-                      }}
-                      value={formData.address}
-                      onChange={handleChange}
-                      required
-                    ></textarea>
-                  </div>
-
-                  {/* Input Password */}
-                  <div className="col-sm-6 col-12 mb-2">
-                    <input
-                      type="password"
-                      name="password"
-                      className="form-control px-3 text-white fw-medium shadow-sm"
-                      placeholder="Password"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        height: "46px",
-                        borderRadius: "8px",
-                      }}
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  {/* Input Konfirmasi Password */}
-                  <div className="col-sm-6 col-12 mb-3">
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      className="form-control px-3 text-white fw-medium shadow-sm"
-                      placeholder="Konfirmasi Password"
-                      style={{
-                        backgroundColor: "#eaeaea",
-                        border: "none",
-                        height: "46px",
-                        borderRadius: "8px",
-                      }}
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
+                      className="form-control"
+                      placeholder="nama@perusahaan.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                 </div>
 
-                {/* Persetujuan Kebijakan Privacy */}
-                <div className="mb-4 px-1">
-                  <div className="form-check">
+                {/* Input Password */}
+                <div className="mb-4">
+                  <label className="form-label text-dark fw-medium small mb-1.5">Buat Kata Sandi</label>
+                  <div className="position-relative d-flex align-items-center">
+                    <i className="bi bi-lock position-absolute text-muted start-0 ms-3"></i>
                     <input
-                      className="form-check-input border-secondary"
-                      type="checkbox"
-                      id="agreeTerms"
-                      style={{ cursor: "pointer" }}
+                      type="password"
+                      className="form-control"
+                      placeholder="Minimal 6 karakter"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-                    <label
-                      className="form-check-label text-secondary small user-select-none"
-                      htmlFor="agreeTerms"
-                      style={{ cursor: "pointer", fontSize: "12px" }}
-                    >
-                      Saya menyetujui{" "}
-                      <a
-                        href="#"
-                        className="text-primary text-decoration-none fw-medium"
-                      >
-                        Syarat & Ketentuan
-                      </a>{" "}
-                      yang berlaku di NocSphere.
-                    </label>
                   </div>
                 </div>
 
-                {/* Tombol Submit */}
-                <button
-                  type="submit"
-                  className="btn text-white w-100 fw-bold shadow-md d-flex align-items-center justify-content-center gap-2"
-                  disabled={loading}
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #1e3a8a 0%, #0f172a 100%)",
-                    height: "46px",
-                    borderRadius: "8px",
-                    border: "none",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {loading ? (
-                    <>
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        aria-hidden="true"
-                      ></span>
-                      <span>Mendaftarkan Server...</span>
-                    </>
-                  ) : (
-                    <span>Register</span>
-                  )}
+                {/* Button Register */}
+                <button type="submit" className="btn btn-primary-noc w-100 fw-bold mb-2" disabled={loading}>
+                  {loading ? <span className="spinner-border spinner-border-sm me-2"></span> : null}
+                  {loading ? "Memproses Registrasi..." : "Buat Akun Perusahaan"}
                 </button>
               </form>
 
-              {/* Tautan Balik ke Login */}
-              <p className="text-center text-muted small mt-4 mb-0">
-                Already have an account?{" "}
-                <a
-                  href="/login"
-                  className="text-primary fw-bold text-decoration-none"
-                >
-                  Login
-                </a>
+              <p className="text-center text-muted small mt-3 mb-0">
+                Sudah memiliki akun?{" "}
+                <a href="#" onClick={(e) => { e.preventDefault(); router.push("/login"); }} className="text-decoration-none fw-semibold text-primary">Silakan Login</a>
               </p>
+
             </div>
           </div>
+
         </div>
       </div>
+      
+      {/* Scope Global Style CSS Utilitas */}
+      <style jsx global>{`
+        .form-control {
+          padding-left: 42px !important;
+          background-color: #f8fafc;
+          border: 1px solid #e2e8f0;
+          height: 48px;
+          border-radius: 8px;
+          font-size: 0.9rem;
+          color: #334155;
+        }
+        .form-control:focus {
+          background-color: #ffffff !important;
+          border-color: #3b82f6 !important;
+          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1) !important;
+        }
+        .form-control + i {
+          pointer-events: none;
+        }
+        .btn-primary-noc {
+          background: linear-gradient(90deg, #1e3a8a 0%, #1e40af 100%);
+          color: white;
+          height: 48px;
+          border-radius: 8px;
+          border: none;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
+        }
+        .btn-primary-noc:hover {
+          opacity: 0.95;
+          transform: translateY(-0.5px);
+        }
+        .fw-extrabold { font-weight: 800; }
+      `}</style>
     </div>
   );
 }

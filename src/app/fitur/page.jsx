@@ -48,10 +48,9 @@ export default function LandingPage() {
             <div className="container">
               <a
                 className="navbar-brand fw-bold d-flex align-items-center"
-                href="#"
+                href="/"
               >
-                <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                Nocsphere
+                <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="100" />
               </a>
 
               <button
@@ -334,10 +333,9 @@ export default function LandingPage() {
             <div className="col-lg-4 col-md-12 mb-4 mb-lg-0">
               <a
                 className="navbar-brand fw-bold d-flex align-items-center mb-3 text-white fs-5"
-                href="#"
+                href="/"
               >
-                <i className="bi bi-hexagon-fill text-primary me-2"></i>{" "}
-                NocSphere
+                <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="100" />
               </a>
               <p
                 className="text-white-50 small lh-lg mb-3"

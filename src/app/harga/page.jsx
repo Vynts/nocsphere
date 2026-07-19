@@ -48,10 +48,9 @@ export default function LandingPage() {
             <div className="container">
               <a
                 className="navbar-brand fw-bold d-flex align-items-center"
-                href="#"
+                href="/"
               >
-                <i className="bi bi-hexagon-fill text-primary me-1"></i>
-                Nocsphere
+                <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="100" />
               </a>
 
               <button
@@ -475,6 +474,10 @@ export default function LandingPage() {
                     <i className="bi bi-check-circle-fill text-primary"></i>{" "}
                     Maintenance
                   </li>
+                  <li className="text-secondary d-flex align-items-center gap-2 my-1">
+                    <i className="bi bi-check-circle-fill text-primary"></i>{" "}
+                    Panduan Instalasi
+                  </li>
                 </ul>
 
                 <button
@@ -495,7 +498,7 @@ export default function LandingPage() {
       {/* WATERMARK SECTION */}
       <section className="footer-watermark-container bg-dark-custom py-5">
         <div className="py-4">
-          <div className="footer-watermark-text text-nowrap">Nocsphere</div>
+          <div className="footer-watermark-text text-nowrap">nocsphere</div>
         </div>
       </section>
 
@@ -512,10 +515,9 @@ export default function LandingPage() {
             <div className="col-lg-4 col-md-12 mb-4 mb-lg-0">
               <a
                 className="navbar-brand fw-bold d-flex align-items-center mb-3 text-white fs-5"
-                href="#"
+                href="/"
               >
-                <i className="bi bi-hexagon-fill text-primary me-2"></i>{" "}
-                Nocsphere
+                <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="100" />
               </a>
               <p
                 className="text-white-50 small lh-lg mb-3"
