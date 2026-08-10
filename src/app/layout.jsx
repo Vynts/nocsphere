@@ -2,7 +2,7 @@
 import React from "react";
 
 export const metadata = {
-  title: "NocSphere - Billing Management System for MikroTik Business",
+  title: "Nocsphere",
   description:
     "Automated billing and network management solution for MikroTik ISP business",
 };

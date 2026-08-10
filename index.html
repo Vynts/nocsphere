@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auth Google & Cloudflare Turnstile</title>
+    
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f6f9;
+            margin: 0;
+        }
+        .card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        h2 {
+            margin-bottom: 8px;
+            color: #333;
+        }
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .btn-google {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        .btn-google:hover {
+            background-color: #357ae8;
+        }
+        .btn-google:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .turnstile-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Login App</h2>
+        <p>Selesaikan verifikasi bot terlebih dahulu untuk melanjutkan login Google.</p>
+
+        <div class="turnstile-container">
+            <div class="cf-turnstile" 
+                 data-sitekey="1x00000000000000000000AA" 
+                 data-callback="onTurnstileSuccess">
+            </div>
+        </div>
+
+        <button id="btnLogin" class="btn-google" disabled onclick="loginWithGoogle()">
+            Login via Google
+        </button>
+    </div>
+
+    <script>
+        let turnstileToken = "";
+
+        // Dipanggil otomatis oleh Cloudflare saat pengguna lolos verifikasi CAPTCHA
+        function onTurnstileSuccess(token) {
+            turnstileToken = token;
+            // Aktifkan tombol login
+            document.getElementById("btnLogin").disabled = false;
+        }
+
+        function loginWithGoogle() {
+            if (!turnstileToken) {
+                alert("Harap selesaikan verifikasi Cloudflare Turnstile terlebih dahulu!");
+                return;
+            }
+
+            // Redirect pengguna ke endpoint FastAPI backend beserta token Turnstile
+            const backendUrl = `http://localhost:8000/api/auth/google/login?cf_turnstile_token=${encodeURIComponent(turnstileToken)}`;
+            window.location.href = backendUrl;
+        }
+    </script>
+
+</body>
+</html>

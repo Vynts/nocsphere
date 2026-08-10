@@ -6,19 +6,6 @@ from contextlib import asynccontextmanager
 from config import database_connection
 from dotenv import load_dotenv
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     try:
-#         async for conn in database_connection():
-#             await add_data_pelanggan(conn=conn)
-#             break
-
-#     except Exception as e:
-#         print(f"[STARTUP ERROR] Gagal menjalankan sinkronisasi awal: {e}")
-    
-#     yield
-#     print("[SHUTDOWN] Server dimatikan, membersihkan koneksi...")
-
 load_dotenv()
 app = FastAPI()
 
@@ -40,5 +27,5 @@ app.include_router(routers.router)
 # app.include_router(user.router)
 app.include_router(invoice.router)
 app.include_router(perusahaan.router)
-# app.include_router(dashboard.router)
+app.include_router(dashboard.router)
 

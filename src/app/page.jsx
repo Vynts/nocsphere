@@ -420,11 +420,13 @@ export default function LandingPage() {
                   className="fw-black text-white mb-4"
                   style={{ fontSize: "2rem" }}
                 >
-                  Rp 3.500.000 <br />
+                  Rp 5.000.000{" "}
                   <span
                     className="text-secondary fw-normal"
                     style={{ fontSize: "13px" }}
-                  >Instalasi nocpshere di Server Lokal</span>
+                  >
+                    / year
+                  </span>
                 </h3>
 
                 <ul
