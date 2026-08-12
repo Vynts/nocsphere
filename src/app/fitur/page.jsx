@@ -302,7 +302,7 @@ export default function LandingPage() {
                 }}
               >
                 <iframe
-                  src="https://www.youtube.com/embed/OlmuFRIGg?si=1tWbuOW5gLYweetD"
+                  src="https://www.youtube.com/embed/OlmuFRIGg?si=1tWW5gLYweetD"
                   title="NocsphereDemo Video"
                   allowFullScreen
                   style={{ borderRadius: "16px" }}
