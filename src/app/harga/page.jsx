@@ -529,7 +529,7 @@ export default function LandingPage() {
                 with unmatched reliability and automated isolation features.
               </p>
               <p className="fw-bold small mb-1">
-                PT NocsphereInovasi Teknologi
+                NocsphereInovasi Teknologi
               </p>
               <p className="text-white-50 small mb-3">
                 Serving the best web billing management community
