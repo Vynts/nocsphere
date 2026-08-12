@@ -103,7 +103,7 @@ export default function LandingPage() {
                 </ul>
                 <div className="d-lg-none d-grid gap-2 mt-3">
                   <a
-                    href="/login"
+                    href="/"
                     className="btn btn-light rounded-pill fw-bold"
                   >
                     Login
@@ -112,7 +112,7 @@ export default function LandingPage() {
               </div>
 
               <a
-                href="/login"
+                href="/"
                 className="btn btn-sm btn-light rounded-pill px-4 fw-bold d-none d-lg-inline-block"
               >
                 Login
@@ -144,14 +144,14 @@ export default function LandingPage() {
               </p>
 
               <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 px-4">
-                <a href="#" className="btn btn-custom-light">
+                <a href="/admin/dashboard" className="btn btn-custom-light">
                   Get Started{" "}
                   <i
                     className="fa-solid fa-arrow-right ms-1"
                     style={{ fontSize: "12px" }}
                   ></i>
                 </a>
-                <a href="#" className="btn btn-custom-outline">
+                <a href="/admin/dashboard" className="btn btn-custom-outline">
                   Live Demo
                 </a>
               </div>
