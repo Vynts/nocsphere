@@ -1,7 +1,7 @@
 import os
 import httpx
 import urllib.parse
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 from aiomysql import Connection, DictCursor
 from config import database_connection
@@ -19,40 +19,16 @@ router = APIRouter(
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "YOUR_GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/auth/google/callback")
-CLOUDFLARE_TURNSTILE_SECRET = os.getenv("CF_TURNSTILE_SECRET", "YOUR_TURNSTILE_SECRET_KEY")
 
 
-# --- HELPER VERIFIKASI CLOUDFLARE TURNSTILE ---
-async def verify_cloudflare_turnstile(token: str) -> bool:
-    """Mengirim request ke Cloudflare untuk memverifikasi token CAPTCHA."""
-    url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-    payload = {
-        "secret": CLOUDFLARE_TURNSTILE_SECRET,
-        "response": token
-    }
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, data=payload)
-        result = res.json()
-        return result.get("success", False)
-
-
-# --- 1. ENDPOINT LOGIN REGULER + VERIFIKASI CLOUDFLARE ---
+# --- 1. ENDPOINT LOGIN REGULER ---
 @router.post("/login", response_model=TokenResponse)
 async def login(
     payload: LoginRequest, 
-    cf_turnstile_token: str = Query(..., description="Token CAPTCHA dari Cloudflare Turnstile"),
     conn: Connection = Depends(database_connection)
 ):
-    # Step A: Verifikasi Turnstile Token
-    is_human = await verify_cloudflare_turnstile(cf_turnstile_token)
-    if not is_human:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Verifikasi Cloudflare Turnstile gagal! Terdeteksi sebagai Bot."
-        )
-
     try:
-        # Step B: Query User dengan DictCursor
+        # Step A: Query User dengan DictCursor
         async with conn.cursor(DictCursor) as cursor:
             await cursor.execute(
                 "SELECT id_perusahaan, tenant_slug, password, level FROM tbl_user WHERE email = %s", 
@@ -60,14 +36,14 @@ async def login(
             )
             perusahaan = await cursor.fetchone()
 
-        # Step C: Validasi User dan Password (DIPERBAIKI)
+        # Step B: Validasi User dan Password
         if not perusahaan or not verify_password(payload.password, perusahaan['password']):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Email atau Password Salah!"
             )
 
-        # Step D: Buat JWT Access Token
+        # Step C: Buat JWT Access Token
         access_token = create_access_token(data={"id_perusahaan": perusahaan['id_perusahaan']})
 
         return {
@@ -92,17 +68,10 @@ async def login(
 
 # --- 2. ENDPOINT GOOGLE OAUTH2 ---
 @router.get("/google/login")
-async def google_login(cf_turnstile_token: str = Query(...)):
+async def google_login():
     """
-    Memvalidasi Turnstile lalu Redirect pengguna ke halaman Login Google.
+    Redirect pengguna langsung ke halaman Login Google.
     """
-    is_human = await verify_cloudflare_turnstile(cf_turnstile_token)
-    if not is_human:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Verifikasi Turnstile gagal."
-        )
-
     google_auth_url = (
         f"https://accounts.google.com/o/oauth2/v2/auth?"
         f"response_type=code&client_id={GOOGLE_CLIENT_ID}&"
@@ -150,11 +119,9 @@ async def google_callback(code: str, conn: Connection = Depends(database_connect
             )
             user = await cursor.fetchone()
 
-            # --- SKENARIO 1: USER BELUM TERDAFTAR (TELEPORT KE REGISTRASI) ---
+            # --- SKENARIO 1: USER BELUM TERDAFTAR ---
             if not user:
-                # Mengembalikan flag 'is_registered': False agar Frontend bisa
-                front_end_url = "http://localhost:3000/register"  #
-                # mengarahkan (teleport) user ke form registrasi perusahaan.
+                front_end_url = "http://localhost:3001/register"
                 query_params = urllib.parse.urlencode({ 
                     "status": "pending_registration",
                     "message": "Akun belum terdaftar. Silakan lengkapi pendaftaran perusahaan Anda.",
@@ -167,14 +134,14 @@ async def google_callback(code: str, conn: Connection = Depends(database_connect
                 })
                 return RedirectResponse(url=f"{front_end_url}?{query_params}")
 
-            # Optional: Update google_id jika user dulu register manual (bukan via Google)
+            # Update google_id jika user dulu register manual
             await cursor.execute(
                 "UPDATE tbl_user SET google_id = %s WHERE email = %s AND google_id IS NULL",
                 (google_id, email)
             )
             await conn.commit()
 
-        # --- SKENARIO 2: USER SUDAH TERDAFTAR (LOGIN BERHASIL) ---
+        # --- SKENARIO 2: USER SUDAH TERDAFTAR ---
         access_token = create_access_token(data={"id_perusahaan": user['id_perusahaan']})
 
         return {
@@ -194,7 +161,8 @@ async def google_callback(code: str, conn: Connection = Depends(database_connect
             detail=f"Gagal memproses login Google: {str(e)}"
         )
 
-# --- 3. REGISTER & LOGOUT (DIPERBAIKI) ---
+
+# --- 3. REGISTER & LOGOUT ---
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(data: PerusahaanCreate, conn: Connection = Depends(database_connection)):
     try:
@@ -225,6 +193,7 @@ async def register(data: PerusahaanCreate, conn: Connection = Depends(database_c
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database Error! {e}"
         )
+
 
 @router.post("/logout")
 async def logout():

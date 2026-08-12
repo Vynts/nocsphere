@@ -51,9 +51,9 @@ export default function DashboardPage() {
                 AE
               </div>
               <div className="overflow-hidden min-w-0">
-                <h6 className="fw-bold mb-0 text-white text-truncate" style={{ fontSize: "15px" }}>Alvinza Erza</h6>
+                <h6 className="fw-bold mb-0 text-white text-truncate" style={{ fontSize: "15px" }}>Nocsphere</h6>
                 <span className="text-white-50 small text-truncate d-block" style={{ fontSize: "12px" }}>
-                  alvinza@nocsphere.net
+                  admin@nocsphere.net
                 </span>
               </div>
             </div>
@@ -139,6 +139,34 @@ export default function DashboardPage() {
           </div>
 
           {/* 3 CARDS STATS */}
+          <div className="row g-3 mb-3 mb-md-4">
+            <div className="col-12 col-sm-6 col-md-4">
+              <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
+                <span className="text-secondary small fw-medium mb-1">Router Online</span>
+                <h4 className="fw-bold text-dark mb-1 fs-5 fs-md-4">12 </h4>
+                <span className="text-success small fw-medium d-flex align-items-center gap-1">
+                  Routers
+                </span>
+              </div>
+            </div>
+
+            <div className="col-12 col-sm-6 col-md-4">
+              <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
+                <span className="text-secondary small fw-medium mb-1">Router Offline</span>
+                <h4 className="fw-bold text-dark mb-1 fs-5 fs-md-4">8 </h4>
+                <span className="text-danger small fw-medium">Routers</span>
+              </div>
+            </div>
+
+            <div className="col-12 col-sm-12 col-md-4">
+              <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
+                <span className="text-secondary small fw-medium mb-1">Pelanggan Ter-isolir</span>
+                <h4 className="fw-bold text-dark mb-1 fs-5 fs-md-4">3</h4>
+                <span className="text-danger small fw-medium">Ter-isolir</span>
+              </div>
+            </div>
+          </div>
+
           <div className="row g-3 mb-3 mb-md-4">
             <div className="col-12 col-sm-6 col-md-4">
               <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
@@ -328,7 +356,7 @@ export default function DashboardPage() {
                     <span>{invoiceFilter}</span>
                   </button>
                   <ul className="dropdown-menu dropdown-menu-start rounded-3 mt-1" style={dropdownMenuStyle}>
-                    {["All Invoices", "Paid", "Processing", "Unpaid"].map((item) => (
+                    {["All Invoices", "Paid", "Pending", "Unpaid"].map((item) => (
                       <li key={item}>
                         <button
                           className={`dropdown-item rounded-2 py-1 px-3 fw-medium ${
@@ -392,7 +420,7 @@ export default function DashboardPage() {
                         style={{ backgroundColor: "#e8f0fe", color: "#1a73e8", fontSize: "12px" }}
                       >
                         <i className="bi bi-clock-fill" style={{ fontSize: "11px" }}></i>
-                        <span>Processing</span>
+                        <span>Pending</span>
                       </span>
                     </td>
                     <td className="px-3 px-sm-4 py-3 text-end text-secondary">

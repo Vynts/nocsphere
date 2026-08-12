@@ -47,46 +47,98 @@ export default function AdminLayout({ children }) {
     {
       title: "Main",
       items: [
-        { label: "Dashboard", path: "/admin/dashboard", icon: "bi-grid-1x2-fill" },
+        {
+          label: "Dashboard",
+          path: "/admin/dashboard",
+          icon: "bi-grid-1x2-fill",
+        },
       ],
     },
     {
       title: "Network & Infrastructure",
       items: [
-        { label: "Routers / NAS", path: "/admin/routers", icon: "bi-hdd-network-fill" },
-        { label: "Network Maps", path: "/admin/network-maps", icon: "bi-diagram-3-fill" },
+        {
+          label: "Routers / NAS",
+          path: "/admin/routers",
+          icon: "bi-hdd-network-fill",
+        },
+        {
+          label: "Network Maps",
+          path: "/admin/network-maps",
+          icon: "bi-diagram-3-fill",
+        },
       ],
     },
     {
       title: "PPPoE Management",
       items: [
-        { label: "PPPoE Active", path: "/admin/pppoe/active", icon: "bi-activity" },
-        { label: "PPPoE Secret", path: "/admin/pppoe/secrets", icon: "bi-key-fill" },
-        { label: "PPPoE Profile", path: "/admin/pppoe/profile", icon: "bi-boxes" },
+        {
+          label: "PPPoE Active",
+          path: "/admin/pppoe/active",
+          icon: "bi-activity",
+        },
+        {
+          label: "PPPoE Secret",
+          path: "/admin/pppoe/secrets",
+          icon: "bi-key-fill",
+        },
+        {
+          label: "PPPoE Profile",
+          path: "/admin/pppoe/profile",
+          icon: "bi-boxes",
+        },
       ],
     },
     {
       title: "Billing & Clients",
       items: [
-        { label: "Pelanggan", path: "/admin/pelanggan", icon: "bi-people-fill" },
+        {
+          label: "Pelanggan",
+          path: "/admin/pelanggan",
+          icon: "bi-people-fill",
+        },
         { label: "Paket", path: "/admin/paket", icon: "bi-box-seam-fill" },
-        { label: "Invoice", path: "/admin/invoices", icon: "bi-receipt-cutoff" },
+        {
+          label: "Invoice",
+          path: "/admin/invoices",
+          icon: "bi-receipt-cutoff",
+        },
         { label: "Isolir", path: "/admin/isolir", icon: "bi-person-fill-lock" },
       ],
     },
     {
       title: "Integrations",
       items: [
-        { label: "WhatsApp Gateway", path: "/admin/wa-gateaway", icon: "bi-whatsapp" },
-        { label: "Bot Telegram", path: "/admin/telegram-bot", icon: "bi-telegram" },
+        {
+          label: "WhatsApp Gateway",
+          path: "/admin/wa-gateaway",
+          icon: "bi-whatsapp",
+        },
+        {
+          label: "Bot Telegram",
+          path: "/admin/telegram-bot",
+          icon: "bi-telegram",
+        },
       ],
     },
     {
       title: "Settings",
       items: [
-        { label: "Billing Settings", path: "/admin/settings/billing", icon: "bi-gear-wide-connected" },
-        { label: "Page Settings", path: "/admin/settings/page", icon: "bi-sliders" },
-        { label: "Profile Settings", path: "/admin/settings/profile", icon: "bi-person-gear" },
+        {
+          label: "Billing Settings",
+          path: "/admin/settings/billing",
+          icon: "bi-gear-wide-connected",
+        },
+        {
+          label: "Page Settings",
+          path: "/admin/settings/page",
+          icon: "bi-sliders",
+        },
+        {
+          label: "Profile Settings",
+          path: "/admin/settings/profile",
+          icon: "bi-person-gear",
+        },
       ],
     },
   ];
@@ -121,12 +173,15 @@ export default function AdminLayout({ children }) {
           >
             <span className="visually-hidden">Loading...</span>
           </div>
-          <span className="fw-semibold text-secondary fs-6">Memuat Halaman...</span>
+          <span className="fw-semibold text-secondary fs-6">
+            Memuat Halaman...
+          </span>
         </div>
       )}
 
       <style jsx global>{`
-        html, body {
+        html,
+        body {
           max-width: 100vw;
           overflow-x: hidden !important;
         }
@@ -231,12 +286,18 @@ export default function AdminLayout({ children }) {
                   onError={() => setLogoError(true)}
                 />
               ) : (
-                <h5 className="fw-bold mb-0 text-white text-center">NOCSphere</h5>
+                <h5 className="fw-bold mb-0 text-white text-center">
+                  NOCSphere
+                </h5>
               )}
             </div>
             <button
               className="btn rounded-circle p-2 d-flex align-items-center justify-content-center border-0 text-white flex-shrink-0"
-              style={{ width: "38px", height: "38px", backgroundColor: "rgba(255, 255, 255, 0.1)" }}
+              style={{
+                width: "38px",
+                height: "38px",
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              }}
               onClick={() => setIsMobileSidebarOpen(false)}
             >
               <i className="bi bi-x-lg fs-6"></i>
@@ -251,15 +312,28 @@ export default function AdminLayout({ children }) {
               AE
             </div>
             <div className="overflow-hidden">
-              <h6 className="fw-bold mb-0 text-white text-truncate" style={{ fontSize: "14px" }}>Alvinza Erza</h6>
-              <span className="text-white-50 small text-truncate d-block" style={{ fontSize: "12px" }}>alvinza@nocsphere.net</span>
+              <h6
+                className="fw-bold mb-0 text-white text-truncate"
+                style={{ fontSize: "14px" }}
+              >
+                Nocsphere
+              </h6>
+              <span
+                className="text-white-50 small text-truncate d-block"
+                style={{ fontSize: "12px" }}
+              >
+                admin@nocsphere.net
+              </span>
             </div>
           </div>
 
           <div className="p-3 flex-grow-1 overflow-y-auto no-scrollbar">
             {navSections.map((section) => (
               <div key={section.title} className="mb-3">
-                <div className="text-uppercase fw-bold text-white-50 px-2 mb-1" style={{ fontSize: "10px", letterSpacing: "0.8px" }}>
+                <div
+                  className="text-uppercase fw-bold text-white-50 px-2 mb-1"
+                  style={{ fontSize: "10px", letterSpacing: "0.8px" }}
+                >
                   {section.title}
                 </div>
                 <nav className="d-flex flex-column gap-1">
@@ -293,7 +367,7 @@ export default function AdminLayout({ children }) {
         style={{ backgroundColor: "#0a1128" }}
       >
         <div className="d-flex flex-column h-100 overflow-hidden">
-          <div className="pt-2 pb-3 px-2 d-flex align-items-center justify-content-center border-bottom border-white border-opacity-10 mb-3 flex-shrink-0">
+          <div className="pt-2 pb-3 px-2 d-flex align-items-center justify-content-center mb-3 flex-shrink-0">
             {!logoError ? (
               <Image
                 src="/img/nocsphere.png"
@@ -312,7 +386,10 @@ export default function AdminLayout({ children }) {
           <div className="overflow-y-auto no-scrollbar flex-grow-1 pe-1">
             {navSections.map((section) => (
               <div key={section.title} className="mb-3">
-                <div className="text-uppercase fw-bold text-white-50 px-3 mb-1" style={{ fontSize: "10px", letterSpacing: "0.8px" }}>
+                <div
+                  className="text-uppercase fw-bold text-white-50 px-3 mb-1"
+                  style={{ fontSize: "10px", letterSpacing: "0.8px" }}
+                >
                   {section.title}
                 </div>
                 <nav className="nav flex-column gap-1">
@@ -373,8 +450,11 @@ export default function AdminLayout({ children }) {
 
             <div className="d-flex align-items-center gap-2">
               <div className="text-end d-none d-sm-block">
-                <div className="fw-semibold text-dark" style={{ fontSize: "14px" }}>
-                  Alvinza Erza
+                <div
+                  className="fw-semibold text-dark"
+                  style={{ fontSize: "14px" }}
+                >
+                  Nocpshere
                 </div>
                 <div className="text-muted" style={{ fontSize: "12px" }}>
                   Superadmin
@@ -390,116 +470,158 @@ export default function AdminLayout({ children }) {
           </div>
         </header>
 
-        <main className="p-3 p-md-4 flex-grow-1 overflow-x-hidden">{children}</main>
+        <main className="p-3 p-md-4 flex-grow-1 overflow-x-hidden">
+          {children}
+        </main>
 
-        <footer
-          className="container bg-white pt-5 pb-4 border-top border-secondary border-opacity-10 position-relative"
-          style={{ minHeight: "450px" }}
-        >
-          <div className="container overflow-hidden">
-            <div
-              className="row g-4 mb-5 text-start position-relative"
-              style={{ zIndex: 2 }}
-            >
-              <div className="col-lg-4 col-md-12 mb-4 mb-lg-0">
+        <footer className="w-100 bg-white text-dark pt-5 pb-4 border-top mt-auto">
+          <div className="container-fluid px-4">
+            <div className="row g-4 mb-5 text-start">
+              {/* Brand & Info Column */}
+              <div className="col-lg-4 col-md-12 pe-lg-5">
                 <a
-                  className="navbar-brand fw-bold d-flex align-items-center mb-3 text-white fs-5"
+                  className="navbar-brand fw-bold d-inline-flex align-items-center mb-3 text-dark fs-5 text-decoration-none"
                   href="/"
                 >
-                  <img className="me-2" src="/img/nocsphere_black.png" alt="NocSphere Logo" width="100" />
+                  <img
+                    src="/img/nocsphere_black.png"
+                    alt="NocSphere Logo"
+                    width="110"
+                    className="img-fluid"
+                    style={{
+                      filter: "drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.35))",
+                    }}
+                  />
                 </a>
-                <p
-                  className="small lh-lg mb-3"
-                  style={{ maxWidth: "350px" }}
-                >
+                <p className="text-secondary small lh-lg mb-3">
                   NocSphere provides high-performing billing management systems
                   with unmatched reliability and automated isolation features.
                 </p>
-                <p className="fw-bold small mb-1">
-                  PT NocSphere Inovasi Teknologi
+                <p className="fw-bold text-dark small mb-1">
+                  NocSphere Inovasi Teknologi
                 </p>
-                <p className="small mb-3">
+                <p className="text-secondary small mb-3">
                   Serving the best web billing management community
                 </p>
 
-                <div className="d-flex gap-2">
-                  <span className="text-dark badge bg-secondary bg-opacity-10 border border-secondary border-opacity-20 px-2 py-1.5 small">
+                <div className="d-flex flex-wrap gap-2">
+                  <span className="badge bg-light text-dark border px-2.5 py-2 small fw-normal">
                     Stripe Verified
                   </span>
-                  <span className="text-dark badge bg-secondary bg-opacity-10 border border-secondary border-opacity-20 px-2 py-1.5 small">
+                  <span className="badge bg-light text-dark border px-2.5 py-2 small fw-normal">
                     PCI Compliant
                   </span>
                 </div>
               </div>
 
+              {/* Navigation Links Columns */}
               <div className="col-lg-8 col-md-12">
-                <div className="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-4">
-                  <div>
-                    <h6 className="text-dark fw-bold footer-heading text-uppercase mb-3">
+                <div className="row g-4">
+                  <div className="col-6 col-sm-3">
+                    <h6 className="fw-bold text-dark text-uppercase small tracking-wider mb-3">
                       Solutions
                     </h6>
-                    <div className="d-flex flex-column">
-                      <a href="#" className="text-dark footer-link-custom">
+                    <div className="d-flex flex-column gap-2">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         PPPoE Accounts
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Hotspot Voucher
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Multi Router API
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Payment Gateway
                       </a>
                     </div>
                   </div>
 
-                  <div>
-                    <h6 className="text-dark fw-bold footer-heading text-uppercase mb-3">
+                  <div className="col-6 col-sm-3">
+                    <h6 className="fw-bold text-dark text-uppercase small tracking-wider mb-3">
                       Legal
                     </h6>
-                    <div className="d-flex flex-column">
-                      <a href="#" className="text-dark footer-link-custom">
+                    <div className="d-flex flex-column gap-2">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Fair Use
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Terms
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Privacy
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         SLA
                       </a>
                     </div>
                   </div>
 
-                  <div>
-                    <h6 className="text-dark fw-bold footer-heading text-uppercase mb-3">
+                  <div className="col-6 col-sm-3">
+                    <h6 className="fw-bold text-dark text-uppercase small tracking-wider mb-3">
                       Services
                     </h6>
-                    <div className="d-flex flex-column">
-                      <a href="#" className="text-dark footer-link-custom">
+                    <div className="d-flex flex-column gap-2">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Client Area
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Status
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Discord
                       </a>
                     </div>
                   </div>
 
-                  <div>
-                    <h6 className="text-dark fw-bold footer-heading text-uppercase mb-3">
+                  <div className="col-6 col-sm-3">
+                    <h6 className="fw-bold text-dark text-uppercase small tracking-wider mb-3">
                       Resources
                     </h6>
-                    <div className="d-flex flex-column">
-                      <a href="#" className="text-dark footer-link-custom">
+                    <div className="d-flex flex-column gap-2">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         Documentation
                       </a>
-                      <a href="#" className="text-dark footer-link-custom">
+                      <a
+                        href="#"
+                        className="text-secondary text-decoration-none small"
+                      >
                         MikroTik MIB API
                       </a>
                     </div>
@@ -508,33 +630,31 @@ export default function AdminLayout({ children }) {
               </div>
             </div>
 
-            <hr className="border-secondary border-opacity-10 my-4" />
+            <hr className="my-4 text-secondary opacity-25" />
 
-            <div
-              className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 position-relative"
-              style={{ zIndex: 2 }}
-            >
-              <span className="small">
+            {/* Bottom Bar */}
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+              <span className="text-secondary small order-2 order-md-1">
                 &copy; 2026 NocSphere. All rights reserved.
               </span>
-              <div className="text-dark d-flex gap-3 fs-5 social-links">
-                <a href="#">
-                  <i className="text-dark fa-brands fa-discord"></i>
+              <div className="d-flex gap-3 fs-5 social-links order-1 order-md-2">
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-discord"></i>
                 </a>
-                <a href="#">
-                  <i className="text-dark fa-brands fa-instagram"></i>
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-instagram"></i>
                 </a>
-                <a href="#">
-                  <i className="text-dark fa-brands fa-youtube"></i>
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-youtube"></i>
                 </a>
-                <a href="#">
-                  <i className="text-dark fa-brands fa-tiktok"></i>
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-tiktok"></i>
                 </a>
-                <a href="#">
-                  <i className="text-dark fa-brands fa-github"></i>
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-github"></i>
                 </a>
-                <a href="#">
-                  <i className="text-dark fa-brands fa-linkedin"></i>
+                <a href="#" className="text-secondary">
+                  <i className="fa-brands fa-linkedin"></i>
                 </a>
               </div>
             </div>

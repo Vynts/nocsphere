@@ -50,7 +50,12 @@ export default function LandingPage() {
                 className="navbar-brand fw-bold d-flex align-items-center"
                 href="/"
               >
-                <img className="me-2" src="/img/nocsphere.png" alt="Logo" width="100" />
+                <img
+                  className="me-2"
+                  src="/img/nocsphere.png"
+                  alt="Logo"
+                  width="100"
+                />
               </a>
 
               <button
@@ -117,7 +122,10 @@ export default function LandingPage() {
 
           <div className="row py-5 my-5 justify-content-center text-center">
             <div className="col-lg-9 my-3">
-              <h1 className="display-4 d-flex flex-column hero-title fw-bold mb-3" style={{ fontSize: "65px" }}>
+              <h1
+                className="display-4 d-flex flex-column hero-title fw-bold mb-3"
+                style={{ fontSize: "65px" }}
+              >
                 Best Solution for
                 <span className="text-white-50">Your MikroTik Business</span>
               </h1>
@@ -311,7 +319,8 @@ export default function LandingPage() {
                   className="fw-bold text-white mb-1"
                   style={{ fontSize: "1.2rem" }}
                 >
-                  Nocsphere Enterprise <span style={{ fontSize: "15px" }}>v1.0</span>
+                  Nocsphere Enterprise{" "}
+                  <span style={{ fontSize: "15px" }}>v1.0</span>
                 </h4>
                 <span className="text-secondary small d-block mb-3">
                   Starting at
@@ -769,7 +778,8 @@ export default function LandingPage() {
                         borderTop: "none",
                       }}
                     >
-                      Kami mendukung penuh integrasi otomatis dengan Midtrans untuk pembayaran QRIS dan VA Bank.
+                      Kami mendukung penuh integrasi otomatis dengan Midtrans
+                      untuk pembayaran QRIS dan VA Bank.
                     </div>
                   </div>
                 </div>
@@ -810,12 +820,18 @@ export default function LandingPage() {
             className="row g-4 mb-5 text-start position-relative"
             style={{ zIndex: 2 }}
           >
-            <div className="col-lg-4 col-md-12 mb-4 mb-lg-0">
+            {/* Brand & Info Column */}
+            <div className="col-lg-4 col-md-12 pe-lg-4">
               <a
-                className="navbar-brand fw-bold d-flex align-items-center mb-3 text-white fs-5"
+                className="navbar-brand fw-bold d-inline-flex align-items-center mb-3 text-white fs-5"
                 href="/"
               >
-                <img className="me-2" src="/img/nocsphere.png" alt="NocSphere Logo" width="100" />
+                <img
+                  src="/img/nocsphere.png"
+                  alt="NocSphere Logo"
+                  width="100"
+                  className="img-fluid"
+                />
               </a>
               <p
                 className="text-white-50 small lh-lg mb-3"
@@ -831,84 +847,124 @@ export default function LandingPage() {
                 Serving the best web billing management community
               </p>
 
-              <div className="d-flex gap-2">
-                <span className="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-1.5 small">
+              <div className="d-flex flex-wrap gap-2">
+                <span className="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-2 small fw-normal">
                   Stripe Verified
                 </span>
-                <span className="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-1.5 small">
+                <span className="badge bg-secondary bg-opacity-10 text-white-50 border border-secondary border-opacity-20 px-2 py-2 small fw-normal">
                   PCI Compliant
                 </span>
               </div>
             </div>
 
+            {/* Navigation Links Columns */}
             <div className="col-lg-8 col-md-12">
               <div className="row row-cols-2 row-cols-sm-2 row-cols-md-4 g-4">
                 <div>
-                  <h6 className="fw-bold footer-heading text-uppercase mb-3">
+                  <h6 className="fw-bold text-white text-uppercase small tracking-wider mb-3">
                     Solutions
                   </h6>
-                  <div className="d-flex flex-column">
-                    <a href="#" className="footer-link-custom">
+                  <div className="d-flex flex-column gap-2">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       PPPoE Accounts
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Hotspot Voucher
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Multi Router API
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Payment Gateway
                     </a>
                   </div>
                 </div>
 
                 <div>
-                  <h6 className="fw-bold footer-heading text-uppercase mb-3">
+                  <h6 className="fw-bold text-white text-uppercase small tracking-wider mb-3">
                     Legal
                   </h6>
-                  <div className="d-flex flex-column">
-                    <a href="#" className="footer-link-custom">
+                  <div className="d-flex flex-column gap-2">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Fair Use
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Terms
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Privacy
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       SLA
                     </a>
                   </div>
                 </div>
 
                 <div>
-                  <h6 className="fw-bold footer-heading text-uppercase mb-3">
+                  <h6 className="fw-bold text-white text-uppercase small tracking-wider mb-3">
                     Services
                   </h6>
-                  <div className="d-flex flex-column">
-                    <a href="#" className="footer-link-custom">
+                  <div className="d-flex flex-column gap-2">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Client Area
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Status
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Discord
                     </a>
                   </div>
                 </div>
 
                 <div>
-                  <h6 className="fw-bold footer-heading text-uppercase mb-3">
+                  <h6 className="fw-bold text-white text-uppercase small tracking-wider mb-3">
                     Resources
                   </h6>
-                  <div className="d-flex flex-column">
-                    <a href="#" className="footer-link-custom">
+                  <div className="d-flex flex-column gap-2">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       Documentation
                     </a>
-                    <a href="#" className="footer-link-custom">
+                    <a
+                      href="#"
+                      className="footer-link-custom text-white-50 text-decoration-none small"
+                    >
                       MikroTik MIB API
                     </a>
                   </div>
@@ -919,30 +975,31 @@ export default function LandingPage() {
 
           <hr className="border-secondary border-opacity-10 my-4" />
 
+          {/* Bottom Bar */}
           <div
             className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 position-relative"
             style={{ zIndex: 2 }}
           >
-            <span className="text-white-50 small">
+            <span className="text-white-50 small order-2 order-md-1">
               &copy; 2026 NocSphere. All rights reserved.
             </span>
-            <div className="d-flex gap-3 fs-5 social-links">
-              <a href="#">
+            <div className="d-flex gap-3 fs-5 social-links order-1 order-md-2">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-discord"></i>
               </a>
-              <a href="#">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-instagram"></i>
               </a>
-              <a href="#">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-youtube"></i>
               </a>
-              <a href="#">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-tiktok"></i>
               </a>
-              <a href="#">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-github"></i>
               </a>
-              <a href="#">
+              <a href="#" className="text-white-50 text-white-hover">
                 <i className="fa-brands fa-linkedin"></i>
               </a>
             </div>
