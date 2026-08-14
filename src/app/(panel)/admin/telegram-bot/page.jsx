@@ -183,20 +183,15 @@ export default function TelegramBotPage() {
 
             {/* Pemicu Alert Notifikasi (Offline & Rusak) */}
             <div className="card p-3 p-sm-4" style={cardCleanStyle}>
-              <h6 className="fw-bold text-dark mb-1 fs-6 d-flex align-items-center gap-2">
-                <i className="bi bi-sliders2 text-primary"></i>
+              <h6 className="fw-bold text-dark mb-3 fs-6 p-2">
                 Pemicu Alert Jaringan
               </h6>
-              <p className="text-muted extra-small mb-3" style={{ fontSize: "12px" }}>
-                Pilih kondisi di mana sistem akan membroadcast alert ke Telegram.
-              </p>
 
               <div className="d-flex flex-column gap-3">
                 {/* Switch 1 */}
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-start gap-2">
-                    <div className="p-2 bg-danger-subtle text-danger rounded-2">
-                      <i className="bi bi-wifi-off d-block"></i>
+                    <div className="text-danger rounded-2">
                     </div>
                     <div>
                       <span className="fw-semibold text-dark d-block" style={{ fontSize: "13px" }}>Perangkat Offline</span>
@@ -217,8 +212,7 @@ export default function TelegramBotPage() {
                 {/* Switch 2 */}
                 <div className="d-flex align-items-center justify-content-between pt-2 border-top">
                   <div className="d-flex align-items-start gap-2">
-                    <div className="p-2 bg-warning-subtle text-warning-emphasis rounded-2">
-                      <i className="bi bi-ticket-perforated d-block"></i>
+                    <div className="text-warning-emphasis rounded-2">
                     </div>
                     <div>
                       <span className="fw-semibold text-dark d-block" style={{ fontSize: "13px" }}>Tiket Laporan Gangguan</span>
@@ -239,8 +233,7 @@ export default function TelegramBotPage() {
                 {/* Switch 3 */}
                 <div className="d-flex align-items-center justify-content-between pt-2 border-top">
                   <div className="d-flex align-items-start gap-2">
-                    <div className="p-2 bg-primary-subtle text-primary rounded-2">
-                      <i className="bi bi-ethernet d-block"></i>
+                    <div className="text-primary rounded-2">
                     </div>
                     <div>
                       <span className="fw-semibold text-dark d-block" style={{ fontSize: "13px" }}>Link Port Down</span>
@@ -261,8 +254,7 @@ export default function TelegramBotPage() {
                 {/* Switch 4 */}
                 <div className="d-flex align-items-center justify-content-between pt-2 border-top">
                   <div className="d-flex align-items-start gap-2">
-                    <div className="p-2 bg-info-subtle text-info-emphasis rounded-2">
-                      <i className="bi bi-activity d-block"></i>
+                    <div className="text-info-emphasis rounded-2">
                     </div>
                     <div>
                       <span className="fw-semibold text-dark d-block" style={{ fontSize: "13px" }}>High Latency / Ping Spike</span>
@@ -290,7 +282,6 @@ export default function TelegramBotPage() {
             {/* 1. Tes Kirim Alert Kerusakan Manual */}
             <div className="card p-3 p-sm-4" style={cardCleanStyle}>
               <h6 className="fw-bold text-dark mb-1 fs-6 d-flex align-items-center gap-2">
-                <i className="bi bi-broadcast text-danger"></i>
                 Simulasi Test Broadcast Alert
               </h6>
               <p className="text-muted extra-small mb-3" style={{ fontSize: "12px" }}>
@@ -361,8 +352,7 @@ export default function TelegramBotPage() {
                     disabled={botStatus !== "active"}
                     className="btn btn-danger rounded-3 fw-semibold px-4 py-2 shadow-none d-flex align-items-center gap-2"
                     style={{ fontSize: "13px" }}
-                  >
-                    <i className="bi bi-send-fill"></i> Kirim Broadcast Alert
+                  > Kirim Broadcast Alert
                   </button>
                 </div>
               </form>
@@ -371,7 +361,6 @@ export default function TelegramBotPage() {
             {/* 2. Editor Template Format Pesan Alert Telegram */}
             <div className="card p-3 p-sm-4" style={cardCleanStyle}>
               <h6 className="fw-bold text-dark mb-1 fs-6 d-flex align-items-center gap-2">
-                <i className="bi bi-code-square text-primary"></i>
                 Format Message Template
               </h6>
               <p className="text-muted extra-small mb-3" style={{ fontSize: "12px" }}>
@@ -387,8 +376,7 @@ export default function TelegramBotPage() {
                     selectedAlertTemplate === "offline" ? "btn-danger text-white" : "btn-light border text-secondary"
                   }`}
                   style={{ fontSize: "12px" }}
-                >
-                  <i className="bi bi-exclamation-octagon-fill"></i> Format Perangkat Offline
+                > Format Perangkat Offline
                 </button>
 
                 <button
@@ -398,8 +386,7 @@ export default function TelegramBotPage() {
                     selectedAlertTemplate === "latency" ? "btn-warning text-dark" : "btn-light border text-secondary"
                   }`}
                   style={{ fontSize: "12px" }}
-                >
-                  <i className="bi bi-exclamation-triangle-fill"></i> Format High Latency
+                > Format High Latency
                 </button>
 
                 <button
@@ -409,8 +396,7 @@ export default function TelegramBotPage() {
                     selectedAlertTemplate === "ticket" ? "btn-primary text-white" : "btn-light border text-secondary"
                   }`}
                   style={{ fontSize: "12px" }}
-                >
-                  <i className="bi bi-receipt-cutoff"></i> Format Tiket Kerusakan
+                > Format Tiket Kerusakan
                 </button>
               </div>
 
@@ -447,8 +433,7 @@ export default function TelegramBotPage() {
                   type="button"
                   className="btn btn-primary rounded-3 fw-semibold px-4 py-2 shadow-none d-flex align-items-center gap-2"
                   style={{ fontSize: "13px" }}
-                >
-                  <i className="bi bi-check2-circle"></i> Simpan Format Template
+                > Simpan Format Template
                 </button>
               </div>
             </div>

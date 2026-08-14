@@ -341,7 +341,7 @@ export default function InvoicesPage() {
               </div>
             </div>
             <div className="d-flex align-items-baseline gap-2">
-              <h3 className="fw-bold text-dark mb-0 font-monospace fs-3">{formatRupiah(totalIncome)}</h3>
+              <h3 className="fw-bold text-dark mb-0 fs-3">{formatRupiah(totalIncome)}</h3>
               <span className="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 fw-semibold" style={{ fontSize: "11px" }}>
                 {paidCount} Transaksi Lunas
               </span>
@@ -364,7 +364,7 @@ export default function InvoicesPage() {
               </div>
             </div>
             <div className="d-flex align-items-baseline gap-2">
-              <h3 className="fw-bold text-dark mb-0 font-monospace fs-3">{formatRupiah(totalUnpaid)}</h3>
+              <h3 className="fw-bold text-dark mb-0 fs-3">{formatRupiah(totalUnpaid)}</h3>
               <span className="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-semibold" style={{ fontSize: "11px" }}>
                 {unpaidCount} Tagihan Pending
               </span>

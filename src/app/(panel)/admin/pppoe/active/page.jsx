@@ -117,17 +117,6 @@ export default function PppoeActivePage() {
     setActiveModal("check");
   };
 
-  const openAddModal = () => {
-    setFormData({
-      name: "",
-      password: "",
-      service: "pppoe",
-      profile: "Home-20Mbps",
-      router: "CCR1009 - Main Gateway",
-    });
-    setActiveModal("add");
-  };
-
   const closeModal = () => {
     setActiveModal(null);
     setSelectedItem(null);
@@ -154,18 +143,18 @@ export default function PppoeActivePage() {
               <h6 className="fw-bold text-dark mb-3 fs-6">Quick Actions</h6>
               
               <div className="d-flex flex-column gap-2">
-                <button
+                <a
                   type="button"
-                  onClick={openAddModal}
+                  href="/admin/pppoe/secrets"
                   className="btn btn-primary rounded-3 fw-semibold text-start d-flex align-items-center justify-content-between px-3 py-2 shadow-none"
                   style={{ fontSize: "14px" }}
                 >
                   <div className="d-flex align-items-center gap-2">
                     <i className="bi bi-plus-lg fs-6"></i>
-                    <span>Tambah PPPoE</span>
+                    <span>Tambah Secret</span>
                   </div>
                   <i className="bi bi-chevron-right extra-small opacity-75"></i>
-                </button>
+                </a>
 
                 <button
                   type="button"

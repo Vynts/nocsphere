@@ -1,17 +1,19 @@
-// app/(panel)/admin/layout.jsx
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-// Component listener untuk mendeteksi perubahan rute
+// Component listener untuk mendeteksi perubahan rute & reset scroll
 function RouteChangeListener({ onRouteComplete }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+    }
     onRouteComplete();
   }, [pathname, searchParams]);
 
@@ -20,14 +22,71 @@ function RouteChangeListener({ onRouteComplete }) {
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
+  const router = useRouter();
+
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // Filter notifikasi ('all' atau 'unread')
+  const [notificationTab, setNotificationTab] = useState("all");
+
+  // Sample data notifikasi
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: "Router Disconnected",
+      message: "Router 'MTR-Jkt-01' kehilangan koneksi.",
+      time: "5 mnt yang lalu",
+      read: false,
+    },
+    {
+      id: 2,
+      title: "Pembayaran Diterima",
+      message: "Invoice #INV-2026-0891 telah dibayar via Midtrans.",
+      time: "25 mnt yang lalu",
+      read: false,
+    },
+    {
+      id: 3,
+      title: "Pelanggan Baru",
+      message: "Budi Santoso terdaftar pada paket 50 Mbps.",
+      time: "2 jam yang lalu",
+      read: true,
+    },
+    {
+      id: 4,
+      title: "Isolir Otomatis",
+      message: "3 akun PPPoE telah di-isolir karena jatuh tempo.",
+      time: "1 hari yang lalu",
+      read: true,
+    },
+  ]);
+
+  const profileDropdownRef = useRef(null);
+  const notificationDropdownRef = useRef(null);
+
   const isActive = (path) => pathname === path;
 
-  // Handle loading selesai saat pertama kali mount
+  // Hitung notifikasi belum dibaca
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Filter notifikasi sesuai tab aktif
+  const filteredNotifications = notifications.filter((n) => {
+    if (notificationTab === "unread") return !n.read;
+    return true;
+  });
+
+  // Handle Initial Load & Fix Reload Scroll Position Bug
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      if ("scrollRestoration" in window.history) {
+        window.history.scrollRestoration = "manual";
+      }
+      window.scrollTo(0, 0);
+    }
     setLoading(false);
   }, []);
 
@@ -42,6 +101,54 @@ export default function AdminLayout({ children }) {
       document.body.style.overflow = "unset";
     };
   }, [isMobileSidebarOpen]);
+
+  // Click outside listener untuk profile & notification dropdowns
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target)
+      ) {
+        setIsProfileDropdownOpen(false);
+      }
+      if (
+        notificationDropdownRef.current &&
+        !notificationDropdownRef.current.contains(event.target)
+      ) {
+        setIsNotificationDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // Close overlays saat rute berubah
+  useEffect(() => {
+    setIsMobileSidebarOpen(false);
+    setIsProfileDropdownOpen(false);
+    setIsNotificationDropdownOpen(false);
+  }, [pathname]);
+
+  // Tandai semua notifikasi sudah dibaca
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  // Tandai satu notifikasi sudah dibaca
+  const markAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+    );
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    setLoading(true);
+    setIsProfileDropdownOpen(false);
+    router.push("/login");
+  };
 
   const navSections = [
     {
@@ -144,40 +251,41 @@ export default function AdminLayout({ children }) {
   ];
 
   return (
-    <div className="min-vh-100" style={{ backgroundColor: "#f4f6f9" }}>
+    <div className="min-vh-100" style={{ backgroundColor: "#eeeeee" }}>
       {/* Route listener untuk mematikan loading saat berpindah page */}
       <Suspense fallback={null}>
         <RouteChangeListener onRouteComplete={() => setLoading(false)} />
       </Suspense>
 
       {/* ================= GLOBAL LOADING OVERLAY ================= */}
-      {loading && (
+      <div
+        className={`d-flex flex-column align-items-center justify-content-center ${
+          loading ? "opacity-100 pe-none-off" : "opacity-0 pe-none"
+        }`}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(255, 255, 255, 0.85)",
+          backdropFilter: "blur(6px)",
+          zIndex: 99999,
+          transition: "opacity 0.25s ease-in-out, visibility 0.25s",
+          visibility: loading ? "visible" : "hidden",
+        }}
+      >
         <div
-          className="d-flex flex-column align-items-center justify-content-center"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(255, 255, 255, 0.82)",
-            backdropFilter: "blur(4px)",
-            zIndex: 99999,
-            transition: "opacity 0.2s ease-in-out",
-          }}
+          className="spinner-border text-primary mb-3"
+          role="status"
+          style={{ width: "2.8rem", height: "2.8rem", borderWidth: "0.22em" }}
         >
-          <div
-            className="spinner-border text-primary mb-3"
-            role="status"
-            style={{ width: "2.8rem", height: "2.8rem", borderWidth: "0.22em" }}
-          >
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <span className="fw-semibold text-secondary fs-6">
-            Memuat Halaman...
-          </span>
+          <span className="visually-hidden">Loading...</span>
         </div>
-      )}
+        <span className="fw-semibold text-secondary fs-6">
+          Memuat Halaman...
+        </span>
+      </div>
 
       <style jsx global>{`
         html,
@@ -199,6 +307,7 @@ export default function AdminLayout({ children }) {
           transition: all 0.2s ease-in-out;
           border-radius: 10px !important;
           background-color: transparent;
+          text-decoration: none;
         }
         .syncara-dark-item:hover {
           background-color: rgba(255, 255, 255, 0.06) !important;
@@ -218,6 +327,7 @@ export default function AdminLayout({ children }) {
           align-items: center;
           justify-content: center;
           font-size: 15px;
+          flex-shrink: 0;
         }
         .syncara-dark-item.active-syncara .syncara-icon-box-dark {
           background-color: #2563eb;
@@ -227,22 +337,124 @@ export default function AdminLayout({ children }) {
           background-color: rgba(255, 255, 255, 0.04);
           color: rgba(255, 255, 255, 0.5);
         }
-        .mobile-dark-nav-link {
-          color: rgba(255, 255, 255, 0.75) !important;
-          font-size: 14px;
-          font-weight: 500;
-          padding: 8px 12px;
-          border-radius: 8px;
-          text-decoration: none;
+
+        /* Responsive Mobile Drawer Animation */
+        .mobile-drawer-backdrop {
+          position: fixed;
+          inset: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 1040;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+            visibility 0.3s;
+        }
+        .mobile-drawer-backdrop.show {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        .mobile-drawer-content {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 280px;
+          max-width: 85vw;
+          background-color: #0a1128;
+          z-index: 1050;
+          transform: translateX(-100%);
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 4px 0 25px rgba(0, 0, 0, 0.3);
+        }
+        .mobile-drawer-content.show {
+          transform: translateX(0);
+        }
+
+        /* Profile & Notification Dropdown Animations */
+        .profile-dropdown-menu,
+        .notification-dropdown-menu {
+          position: absolute;
+          top: calc(100% + 10px);
+          right: 0;
+          background-color: #ffffff;
+          border-radius: 14px;
+          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12),
+            0 8px 10px -6px rgba(0, 0, 0, 0.05);
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          z-index: 1000;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-8px) scale(0.96);
+          transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+            transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
+        }
+        .profile-dropdown-menu {
+          width: 210px;
+          padding: 8px 0;
+        }
+        .notification-dropdown-menu {
+          width: 380px;
+          max-width: 90vw;
+          padding: 0;
+          overflow: hidden;
+        }
+        .profile-dropdown-menu.show,
+        .notification-dropdown-menu.show {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0) scale(1);
+        }
+
+        .dropdown-item-custom {
           display: flex;
           align-items: center;
-          gap: 12px;
+          padding: 9px 16px;
+          font-size: 13.5px;
+          color: #374151;
+          font-weight: 500;
+          text-decoration: none;
+          transition: background-color 0.15s ease, color 0.15s ease;
+          border: none;
+          background: transparent;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
         }
-        .mobile-dark-nav-link.active-mobile {
-          background-color: rgba(255, 255, 255, 0.08);
-          color: #ffffff !important;
-          font-weight: 600;
-          border-left: 3px solid #2563eb;
+        .dropdown-item-custom:hover {
+          background-color: #f3f4f6;
+          color: #1d4ed8;
+        }
+        .dropdown-item-custom.danger:hover {
+          background-color: #fef2f2;
+          color: #dc2626;
+        }
+
+        /* FIX LEBAR & TINGGI SERAGAM UNTUK CARD NOTIFIKASI */
+        .notification-card {
+          width: 100% !important;
+          box-sizing: border-box !important;
+          border: 1px solid rgba(0, 0, 0, 0.08);
+          border-radius: 12px;
+          padding: 10px 14px;
+          background-color: #ffffff;
+          transition: all 0.2s ease;
+          cursor: pointer;
+          display: flex;
+          gap: 12px;
+          align-items: center; /* Posisikan item tegak lurus di tengah */
+          min-height: 68px; /* Memaksa semua card memiliki tinggi yang persis sama */
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        .notification-card:hover {
+          background-color: #f8fafc;
+          border-color: rgba(37, 99, 235, 0.25);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        .notification-card.unread {
+          background-color: #f0f7ff;
+          border-color: rgba(37, 99, 235, 0.2);
         }
 
         /* Desktop Layout Wrapper Rules (280px) */
@@ -265,103 +477,113 @@ export default function AdminLayout({ children }) {
             width: 100%;
             margin-left: 0;
           }
+          .notification-dropdown-menu {
+            right: -50px;
+          }
         }
       `}</style>
 
-      {/* MOBILE DRAWER */}
-      {isMobileSidebarOpen && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 z-3 d-md-none d-flex flex-column overflow-auto no-scrollbar"
-          style={{ backgroundColor: "#0a1128" }}
-        >
-          <div className="px-3 py-3 border-bottom border-white border-opacity-10 d-flex align-items-center justify-content-between flex-shrink-0">
-            <div className="d-flex align-items-center justify-content-start">
-              {!logoError ? (
-                <Image
-                  src="/img/nocsphere.png"
-                  alt="NOCSphere Logo"
-                  width={130}
-                  height={30}
-                  style={{ objectFit: "contain" }}
-                  onError={() => setLogoError(true)}
-                />
-              ) : (
-                <h5 className="fw-bold mb-0 text-white text-center">
-                  NOCSphere
-                </h5>
-              )}
-            </div>
-            <button
-              className="btn rounded-circle p-2 d-flex align-items-center justify-content-center border-0 text-white flex-shrink-0"
-              style={{
-                width: "38px",
-                height: "38px",
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-              }}
-              onClick={() => setIsMobileSidebarOpen(false)}
-            >
-              <i className="bi bi-x-lg fs-6"></i>
-            </button>
+      {/* ================= ANIMATED MOBILE DRAWER ================= */}
+      <div
+        className={`mobile-drawer-backdrop d-md-none ${
+          isMobileSidebarOpen ? "show" : ""
+        }`}
+        onClick={() => setIsMobileSidebarOpen(false)}
+      />
+      <div
+        className={`mobile-drawer-content d-md-none d-flex flex-column ${
+          isMobileSidebarOpen ? "show" : ""
+        }`}
+      >
+        <div className="px-3 py-3 border-bottom border-white border-opacity-10 d-flex align-items-center justify-content-between flex-shrink-0">
+          <div className="d-flex align-items-center justify-content-start">
+            {!logoError ? (
+              <Image
+                src="/img/nocsphere.png"
+                alt="NOCSphere Logo"
+                width={130}
+                height={30}
+                style={{ objectFit: "contain" }}
+                onError={() => setLogoError(true)}
+              />
+            ) : (
+              <h5 className="fw-bold mb-0 text-white text-center">NOCSphere</h5>
+            )}
           </div>
+          <button
+            className="btn rounded-circle p-2 d-flex align-items-center justify-content-center border-0 text-white flex-shrink-0"
+            style={{
+              width: "38px",
+              height: "38px",
+              backgroundColor: "rgba(255, 255, 255, 0.1)",
+            }}
+            onClick={() => setIsMobileSidebarOpen(false)}
+          >
+            <i className="bi bi-x-lg fs-6"></i>
+          </button>
+        </div>
 
-          <div className="px-3 py-3 border-bottom border-white border-opacity-10 d-flex align-items-center gap-3 flex-shrink-0">
-            <div
-              className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-6 flex-shrink-0"
-              style={{ width: "40px", height: "40px" }}
-            >
-              AE
-            </div>
-            <div className="overflow-hidden">
-              <h6
-                className="fw-bold mb-0 text-white text-truncate"
-                style={{ fontSize: "14px" }}
-              >
-                Nocsphere
-              </h6>
-              <span
-                className="text-white-50 small text-truncate d-block"
-                style={{ fontSize: "12px" }}
-              >
-                admin@nocsphere.net
-              </span>
-            </div>
+        <div className="px-3 py-3 border-bottom border-white border-opacity-10 d-flex align-items-center gap-3 flex-shrink-0">
+          <div
+            className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold fs-6 flex-shrink-0"
+            style={{ width: "40px", height: "40px" }}
+          >
+            AE
           </div>
-
-          <div className="p-3 flex-grow-1 overflow-y-auto no-scrollbar">
-            {navSections.map((section) => (
-              <div key={section.title} className="mb-3">
-                <div
-                  className="text-uppercase fw-bold text-white-50 px-2 mb-1"
-                  style={{ fontSize: "10px", letterSpacing: "0.8px" }}
-                >
-                  {section.title}
-                </div>
-                <nav className="d-flex flex-column gap-1">
-                  {section.items.map((item) => {
-                    const active = isActive(item.path);
-                    return (
-                      <Link
-                        key={item.path}
-                        href={item.path}
-                        onClick={() => {
-                          if (pathname !== item.path) setLoading(true);
-                          setIsMobileSidebarOpen(false);
-                        }}
-                        className={`mobile-dark-nav-link ${active ? "active-mobile" : ""}`}
-                      >
-                        <i className={`bi ${item.icon} fs-6`}></i>
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </nav>
-              </div>
-            ))}
+          <div className="overflow-hidden">
+            <h6
+              className="fw-bold mb-0 text-white text-truncate"
+              style={{ fontSize: "14px" }}
+            >
+              Nocsphere
+            </h6>
+            <span
+              className="text-white-50 small text-truncate d-block"
+              style={{ fontSize: "12px" }}
+            >
+              admin@nocsphere.net
+            </span>
           </div>
         </div>
-      )}
 
-      {/* DESKTOP SIDEBAR */}
+        <div className="p-3 flex-grow-1 overflow-y-auto no-scrollbar">
+          {navSections.map((section) => (
+            <div key={section.title} className="mb-3">
+              <div
+                className="text-uppercase fw-bold text-white-50 px-3 mb-1"
+                style={{ fontSize: "10px", letterSpacing: "0.8px" }}
+              >
+                {section.title}
+              </div>
+              <nav className="nav flex-column gap-1">
+                {section.items.map((item) => {
+                  const active = isActive(item.path);
+                  return (
+                    <Link
+                      key={item.path}
+                      href={item.path}
+                      onClick={() => {
+                        if (pathname !== item.path) setLoading(true);
+                        setIsMobileSidebarOpen(false);
+                      }}
+                      className={`nav-link syncara-dark-item px-3 py-2 d-flex align-items-center gap-3 ${
+                        active ? "active-syncara" : ""
+                      }`}
+                    >
+                      <div className="syncara-icon-box-dark">
+                        <i className={`bi ${item.icon}`}></i>
+                      </div>
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= DESKTOP SIDEBAR ================= */}
       <aside
         className="d-none d-md-flex flex-column justify-content-between p-3 admin-sidebar-desktop"
         style={{ backgroundColor: "#0a1128" }}
@@ -379,7 +601,9 @@ export default function AdminLayout({ children }) {
                 priority
               />
             ) : (
-              <h5 className="fw-bold mb-0 text-white text-center">NOCSphere</h5>
+              <h5 className="fw-bold mb-0 text-white text-center">
+                NOCSphere
+              </h5>
             )}
           </div>
 
@@ -420,7 +644,7 @@ export default function AdminLayout({ children }) {
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+      {/* ================= MAIN CONTENT AREA ================= */}
       <div className="admin-content-wrapper d-flex flex-column min-vh-100">
         <header
           className="bg-white border-bottom px-3 px-md-4 py-2 d-flex align-items-center justify-content-between flex-shrink-0"
@@ -434,37 +658,252 @@ export default function AdminLayout({ children }) {
             >
               <i className="bi bi-list fs-4"></i>
             </button>
-            <span className="fw-semibold text-dark d-md-none fs-6"></span>
+            <div className="d-md-none ms-1 d-flex align-items-center">
+              <Image
+                src="/img/nocsphere_black.png"
+                alt="NOCSphere Logo"
+                width={100}
+                height={26}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
           </div>
 
           <div className="d-flex align-items-center gap-2 gap-sm-3">
-            <button
-              className="btn btn-light rounded-circle position-relative p-2 d-flex align-items-center justify-content-center text-secondary border-0"
-              style={{ width: "38px", height: "38px" }}
-            >
-              <i className="bi bi-bell fs-6"></i>
-              <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
-            </button>
+            {/* ================= NOTIFICATION DROPDOWN ================= */}
+            <div className="position-relative" ref={notificationDropdownRef}>
+              <button
+                className="btn btn-light rounded-circle position-relative p-2 d-flex align-items-center justify-content-center text-secondary border-0"
+                style={{ width: "38px", height: "38px" }}
+                onClick={() => {
+                  setIsNotificationDropdownOpen(!isNotificationDropdownOpen);
+                  setIsProfileDropdownOpen(false);
+                }}
+              >
+                <i className="bi bi-bell fs-6"></i>
+                {unreadCount > 0 && (
+                  <span
+                    className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light"
+                    style={{ fontSize: "10px", padding: "3px 6px" }}
+                  >
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {/* DROPDOWN MENU NOTIFIKASI */}
+              <div
+                className={`notification-dropdown-menu ${
+                  isNotificationDropdownOpen ? "show" : ""
+                }`}
+              >
+                {/* Header Dropdown */}
+                <div className="p-3 border-bottom d-flex align-items-center justify-content-between bg-light-subtle">
+                  <div className="d-flex align-items-center gap-2">
+                    <h6 className="fw-bold mb-0 text-dark fs-6">Notifikasi</h6>
+                    {unreadCount > 0 && (
+                      <span className="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2">
+                        {unreadCount} baru
+                      </span>
+                    )}
+                  </div>
+                  {unreadCount > 0 && (
+                    <button
+                      onClick={markAllAsRead}
+                      className="btn btn-outline-primary btn-sm px-2.5 py-1 text-decoration-none fw-semibold border"
+                      style={{ fontSize: "11.5px", borderRadius: "8px" }}
+                    >
+                      Tandai Dibaca
+                    </button>
+                  )}
+                </div>
+
+                {/* Filter Tabs */}
+                <div className="d-flex border-bottom bg-white px-3 py-2 gap-2">
+                  <button
+                    className={`btn btn-sm px-3 py-1 rounded-pill border ${
+                      notificationTab === "all"
+                        ? "btn-primary border-primary fw-semibold"
+                        : "btn-light text-secondary border-secondary-subtle"
+                    }`}
+                    style={{ fontSize: "12px" }}
+                    onClick={() => setNotificationTab("all")}
+                  >
+                    Semua
+                  </button>
+                  <button
+                    className={`btn btn-sm px-3 py-1 rounded-pill border ${
+                      notificationTab === "unread"
+                        ? "btn-primary border-primary fw-semibold"
+                        : "btn-light text-secondary border-secondary-subtle"
+                    }`}
+                    style={{ fontSize: "12px" }}
+                    onClick={() => setNotificationTab("unread")}
+                  >
+                    Belum Dibaca
+                  </button>
+                </div>
+
+                {/* List Notifikasi Berbentuk Card (Tinggi & Lebar Sama Persis) */}
+                <div
+                  className="overflow-y-auto no-scrollbar p-3 d-flex flex-column align-items-stretch gap-2"
+                  style={{ maxHeight: "350px", backgroundColor: "#f8fafc" }}
+                >
+                  {filteredNotifications.length > 0 ? (
+                    filteredNotifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`notification-card w-100 ${
+                          !n.read ? "unread" : ""
+                        }`}
+                        onClick={() => markAsRead(n.id)}
+                      >
+                        {/* Icon Kotak Biru */}
+                        <div
+                          className="bg-primary-subtle text-primary border border-primary-subtle d-flex align-items-center justify-content-center flex-shrink-0"
+                          style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "10px",
+                            fontSize: "15px",
+                          }}
+                        >
+                          <i className="bi bi-bell-fill text-primary"></i>
+                        </div>
+
+                        {/* Konten Teks dengan Truncate Single Line */}
+                        <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                          <div className="d-flex align-items-center justify-content-between mb-0.5 gap-2">
+                            <h6
+                              className="fw-semibold mb-0 text-dark text-truncate"
+                              style={{ fontSize: "13px" }}
+                            >
+                              {n.title}
+                            </h6>
+                            <span
+                              className="text-muted flex-shrink-0"
+                              style={{ fontSize: "10.5px" }}
+                            >
+                              {n.time}
+                            </span>
+                          </div>
+                          <p
+                            className="text-secondary mb-0 text-truncate"
+                            style={{
+                              fontSize: "12px",
+                              lineHeight: "1.3",
+                            }}
+                          >
+                            {n.message}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-4 text-center text-muted">
+                      <i className="bi bi-bell-slash fs-3 d-block mb-1 opacity-50"></i>
+                      <span style={{ fontSize: "13px" }}>
+                        Tidak ada notifikasi
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer Dropdown */}
+                <div className="p-2 border-top text-center bg-white">
+                  <Link
+                    href="/admin/notifications"
+                    className="text-primary text-decoration-none fw-semibold d-block py-1"
+                    style={{ fontSize: "12.5px" }}
+                    onClick={() => setIsNotificationDropdownOpen(false)}
+                  >
+                    Lihat Semua Notifikasi
+                  </Link>
+                </div>
+              </div>
+            </div>
 
             <div className="vr d-none d-sm-block my-2 text-muted opacity-25"></div>
 
-            <div className="d-flex align-items-center gap-2">
-              <div className="text-end d-none d-sm-block">
-                <div
-                  className="fw-semibold text-dark"
-                  style={{ fontSize: "14px" }}
-                >
-                  Nocpshere
-                </div>
-                <div className="text-muted" style={{ fontSize: "12px" }}>
-                  Superadmin
-                </div>
-              </div>
+            {/* ================= USER PROFILE WITH DROPDOWN ================= */}
+            <div className="position-relative" ref={profileDropdownRef}>
               <div
-                className="bg-primary-subtle border border-primary-subtle rounded-circle d-flex align-items-center justify-content-center fw-bold text-primary flex-shrink-0"
-                style={{ width: "38px", height: "38px", fontSize: "13px" }}
+                className="d-flex align-items-center gap-2"
+                style={{ cursor: "pointer", userSelect: "none" }}
+                onClick={() => {
+                  setIsProfileDropdownOpen(!isProfileDropdownOpen);
+                  setIsNotificationDropdownOpen(false);
+                }}
               >
-                AE
+                <div className="text-end d-none d-sm-block">
+                  <div
+                    className="fw-semibold text-dark"
+                    style={{ fontSize: "14px" }}
+                  >
+                    Nocpshere
+                  </div>
+                  <div className="text-muted" style={{ fontSize: "12px" }}>
+                    Superadmin
+                  </div>
+                </div>
+                <div
+                  className="bg-primary-subtle border border-primary-subtle rounded-circle d-flex align-items-center justify-content-center fw-bold text-primary flex-shrink-0"
+                  style={{ width: "38px", height: "38px", fontSize: "13px" }}
+                >
+                  AE
+                </div>
+                <i
+                  className={`bi bi-chevron-down text-muted fs-7 transition-transform d-none d-sm-block ${
+                    isProfileDropdownOpen ? "rotate-180" : ""
+                  }`}
+                  style={{
+                    fontSize: "11px",
+                    transition: "transform 0.2s ease",
+                    transform: isProfileDropdownOpen
+                      ? "rotate(180deg)"
+                      : "rotate(0deg)",
+                  }}
+                ></i>
+              </div>
+
+              {/* DROPDOWN MENU */}
+              <div
+                className={`profile-dropdown-menu ${
+                  isProfileDropdownOpen ? "show" : ""
+                }`}
+              >
+                <div className="px-3 py-2 border-bottom mb-1">
+                  <div
+                    className="fw-semibold text-dark text-truncate"
+                    style={{ fontSize: "13px" }}
+                  >
+                    Nocsphere Admin
+                  </div>
+                  <div
+                    className="text-muted text-truncate"
+                    style={{ fontSize: "11px" }}
+                  >
+                    admin@nocsphere.net
+                  </div>
+                </div>
+
+                <Link
+                  href="/admin/settings/profile"
+                  className="dropdown-item-custom"
+                  onClick={() => setIsProfileDropdownOpen(false)}
+                >
+                  <span>Profile Settings</span>
+                </Link>
+
+                <div className="border-top my-1"></div>
+
+                <button
+                  onClick={handleLogout}
+                  className="dropdown-item-custom danger gap-2"
+                >
+                  <i className="bi bi-box-arrow-right text-danger fs-6"></i>
+                  <span className="text-danger fw-semibold">Logout</span>
+                </button>
               </div>
             </div>
           </div>

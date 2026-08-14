@@ -33,7 +33,7 @@ export default function AuthRootLayout({ children }) {
         />
 
         {/* Custom CSS Murni dari folder public/css */}
-        <link rel="stylesheet" href="/css/public.css" />
+        <link rel="stylesheet" href="/css/landing_page.css" />
       </head>
 
       <body style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -43,6 +43,11 @@ export default function AuthRootLayout({ children }) {
         <script
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
           async
+        ></script>
+
+        <script
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key="YOUR_MIDTRANS_CLIENT_KEY"
         ></script>
       </body>
     </html>

@@ -282,9 +282,6 @@ export default function RoutersPage() {
                 </div>
               </div>
 
-              <span className="text-muted small fw-medium">
-                {filteredRouters.length} {filteredRouters.length === 1 ? "router" : "routers"}
-              </span>
             </div>
 
             <div className="table-responsive">

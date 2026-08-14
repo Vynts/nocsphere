@@ -245,7 +245,7 @@ export default function IsolirPage() {
               </div>
             </div>
             <div className="d-flex align-items-baseline gap-2">
-              <h3 className="fw-bold text-dark mb-0 font-monospace fs-3">{autoIsolirCount} Pelanggan</h3>
+              <h3 className="fw-bold text-dark mb-0 fs-3">{autoIsolirCount} Pelanggan</h3>
               <span className="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 fw-semibold" style={{ fontSize: "11px" }}>
                 Tunggakan Tagihan
               </span>
@@ -268,7 +268,7 @@ export default function IsolirPage() {
               </div>
             </div>
             <div className="d-flex align-items-baseline gap-2">
-              <h3 className="fw-bold text-dark mb-0 font-monospace fs-3">{manualIsolirCount} Pelanggan</h3>
+              <h3 className="fw-bold text-dark mb-0 fs-3">{manualIsolirCount} Pelanggan</h3>
               <span className="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 fw-semibold" style={{ fontSize: "11px" }}>
                 Tindakan Admin
               </span>
@@ -451,7 +451,7 @@ export default function IsolirPage() {
                               {item.reason}
                             </span>
                             {item.unpaidAmount > 0 && (
-                              <span className="text-danger font-monospace fw-bold extra-small" style={{ fontSize: "11px" }}>
+                              <span className="text-danger fw-bold extra-small" style={{ fontSize: "11px" }}>
                                 Tunggakan: {formatRupiah(item.unpaidAmount)}
                               </span>
                             )}

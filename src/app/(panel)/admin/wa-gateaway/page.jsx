@@ -251,7 +251,6 @@ export default function WaGatewayPage() {
             {/* 1. Card Tes Kirim Pesan Manual */}
             <div className="card p-3 p-sm-4" style={cardCleanStyle}>
               <h6 className="fw-bold text-dark mb-1 fs-6">
-                <i className="bi bi-send-fill text-primary me-2"></i>
                 Tes Kirim Pesan WhatsApp API
               </h6>
               <p className="text-muted extra-small mb-3" style={{ fontSize: "12px" }}>
@@ -318,7 +317,6 @@ export default function WaGatewayPage() {
             {/* 2. Card Editor Templat Pesan Notifikasi */}
             <div className="card p-3 p-sm-4" style={cardCleanStyle}>
               <h6 className="fw-bold text-dark mb-1 fs-6">
-                <i className="bi bi-chat-quote-fill text-warning me-2"></i>
                 Templat Pesan Otomatis
               </h6>
               <p className="text-muted extra-small mb-3" style={{ fontSize: "12px" }}>
@@ -375,7 +373,7 @@ export default function WaGatewayPage() {
               {/* Editor Textarea */}
               <div className="mb-3">
                 <textarea
-                  className="form-control rounded-3 p-3 shadow-none font-monospace"
+                  className="form-control rounded-3 p-3 shadow-none"
                   rows="5"
                   value={templates[selectedTemplate]}
                   onChange={(e) => handleTemplateChange(e.target.value)}
