@@ -23,13 +23,14 @@ class RouterCreate(BaseModel):
 class RouterResponse(BaseModel):
     id_router: int
     id_perusahaan: int
-    nama_router: str
-    host: str
+    label_router: str  # Disesuaikan dari nama_router
+    host: str          # Disesuaikan dari ip_address
     username_router: str
     port: int
-    latitude: Optional[str]
-    longitude: Optional[str]
-    created_at: datetime
+    status: Optional[str] = "offline"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    created_at: Optional[str] = None
 
     class Config:
         from_attributes = True

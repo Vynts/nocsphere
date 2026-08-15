@@ -1,10 +1,11 @@
+import asyncio
+from typing import List
 from config import database_connection
 from fastapi import APIRouter, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
 from backend.schemas.router_schemas import RouterCreate, RouterResponse, RouterUpdate, RouterConnect, ProfileCreate
 from backend.utils.security import generate_password_hash, check_password_hash, get_current_perusahaan
-from backend.utils.routers import get_active, get_profile, get_secret, add_profile, edit_profile, delete_profile, connect_to_router
+from backend.utils.routers import get_active, get_profile, get_secret, add_profile, edit_profile, delete_profile, connect_to_router, check_router_status
 from aiomysql import Connection
-import asyncio
 
 router = APIRouter( 
     prefix="/api/router",
@@ -40,20 +41,47 @@ async def get_router_by_id(id_router: int, current_id: int = Depends(get_current
             detail=f"Database Error! {e}"
         )
 
-@router.get("/list", response_model=RouterResponse)
-async def get_router(current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
+@router.get("/list", response_model=List[RouterResponse])  # Gunakan List[...] jika return array
+async def get_router(
+    current_id: int = Depends(get_current_perusahaan), 
+    conn: Connection = Depends(database_connection)
+):
     try:
+        # Gunakan DictCursor agar hasil query berbentuk Dictionary / Dict (bukan Tuple)
         async with conn.cursor() as cursor:
+            # SQL dibetulkan: WHERE sebelum ORDER BY
+            query = """
+                SELECT * FROM tbl_router 
+                WHERE id_perusahaan = %s 
+                ORDER BY id_router DESC
+            """
+            # Parameter tuple membutuhkan koma trailing: (current_id,)
+            await cursor.execute(query, (current_id,))
+            routers = await cursor.fetchall()
 
-            await cursor.execute("SELECT * FROM tbl_router ORDER BY desc WHERE id_perusahaan = %s", (current_id))
-            mikrotik_list = await cursor.fetchall()
+        if not routers:
+            return []
 
-        return mikrotik_list
-    
+        # Ping status secara paralel
+        tasks = [
+            check_router_status(
+                r.get("ip_address") or r.get("ip"), 
+                r.get("port") or 8728
+            ) 
+            for r in routers
+        ]
+        statuses = await asyncio.gather(*tasks)
+
+        # Assign status ke objek dictionary
+        for router_item, status_result in zip(routers, statuses):
+            router_item["status"] = status_result
+
+        return routers
+
     except HTTPException as e:
         raise e
-    
     except Exception as e:
+        print(f"[Backend Error /list]: {e}")  # Cek terminal FastAPI untuk log detail
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database Error! {e}"

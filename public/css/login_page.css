@@ -1,0 +1,132 @@
+:root {
+  --noc-bg-navy: #090e17;
+  --noc-card-navy: #0f172a;
+  --noc-accent-cyan: #0284c7;
+  --noc-glow-cyan: #38bdf8;
+  --noc-border-dark: rgba(255, 255, 255, 0.12);
+}
+
+body {
+  background-color: var(--noc-bg-navy) !important;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+.login-container {
+  background-color: var(--noc-card-navy);
+  border: 1px solid var(--noc-border-dark);
+  border-radius: 28px;
+  width: 100%;
+  max-width: 900px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+}
+
+/* CONTAINER GAMBAR (EQUAL WIDTH 50% - 50%) */
+.login-image-side {
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+}
+
+.login-image-side img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* FORM LOGIN */
+.login-form-side {
+  padding: 40px 32px;
+}
+
+@media (min-width: 768px) {
+  .login-form-side {
+    padding: 48px;
+  }
+}
+
+.form-control-noc {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--noc-border-dark);
+  color: #ffffff !important;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-control-noc:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--noc-glow-cyan);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+  outline: none;
+}
+
+.form-control-noc::placeholder {
+  color: #64748b;
+}
+
+.btn-noc-primary {
+  background-color: var(--noc-accent-cyan);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 14px;
+  border-radius: 50px;
+  border: none;
+  width: 100%;
+  font-size: 1rem;
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-noc-primary:hover {
+  background-color: #0369a1;
+  transform: translateY(-1px);
+}
+
+.btn-tanya-admin-login {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--noc-border-dark);
+  color: #94a3b8;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-tanya-admin-login:hover {
+  background-color: #25d366;
+  color: #ffffff;
+  border-color: #25d366;
+}
+
+.btn-kembali-beranda {
+  position: "absolute";
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+  width: 40px;
+  height: 40px;
+  border-radius: "50%";
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}

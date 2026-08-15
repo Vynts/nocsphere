@@ -14,7 +14,7 @@ router = APIRouter(
 async def ambil_profil(current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("SELECT * FROM tbl_perusahaan WHERE id_perusahaan = %s", (current_id,))
+            await cursor.execute("SELECT a.*, b.email, b.level FROM tbl_perusahaan a LEFT JOIN tbl_user b ON a.id_perusahaan = b.id_perusahaan WHERE a.id_perusahaan = %s", (current_id,))
             perusahaan = await cursor.fetchone()
 
             return {

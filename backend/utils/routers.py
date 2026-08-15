@@ -1,10 +1,26 @@
+import asyncio
 import routeros_api
-from aiomysql import Connection
+from aiomysql import Connection, pool
 from fastapi import Depends
 from backend.schemas.router_schemas import RouterConnect
 from backend.utils.security import get_current_perusahaan
 from werkzeug.security import generate_password_hash
 from config import database_connection
+
+# function untuk mengecek apakah router masih aktif atau tidak
+# Di backend (router.py)
+async def check_router_status(ip: str, port: int = 8728) -> str:
+    try:
+        # Ubah timeout dari 1.0 ke 0.3 detik
+        _, writer = await asyncio.wait_for(
+            asyncio.open_connection(ip, port), 
+            timeout=0.3
+        )
+        writer.close()
+        await writer.wait_closed()
+        return "online"
+    except Exception:
+        return "offline"
 
 # mengambil data dari router
 

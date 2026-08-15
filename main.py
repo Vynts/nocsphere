@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.routes import auth, user, invoice, routers, dashboard, perusahaan
-# from backend.utils.routers import add_data_pelanggan
-from contextlib import asynccontextmanager
 from config import database_connection
 from dotenv import load_dotenv
 

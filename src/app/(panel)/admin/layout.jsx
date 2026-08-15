@@ -23,12 +23,17 @@ function RouteChangeListener({ onRouteComplete }) {
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [companyProfile, setCompanyProfile] = useState(null);
+
+  // State untuk autentikasi dan loader
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] =
+    useState(false);
   const [logoError, setLogoError] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   // Filter notifikasi ('all' atau 'unread')
   const [notificationTab, setNotificationTab] = useState("all");
@@ -79,16 +84,47 @@ export default function AdminLayout({ children }) {
     return true;
   });
 
-  // Handle Initial Load & Fix Reload Scroll Position Bug
+  // Handle Auth Check & Initial Load
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if ("scrollRestoration" in window.history) {
-        window.history.scrollRestoration = "manual";
+      const token = localStorage.getItem("access_token");
+
+      if (!token) {
+        router.replace("/login_admin");
+        return;
       }
-      window.scrollTo(0, 0);
+
+      // Fetch Profil Perusahaan
+      fetch("http://localhost:8000/api/perusahaan/me", {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Gagal mengambil data profil");
+          return res.json();
+        })
+        .then((resJson) => {
+          if (resJson.status === "success") {
+            setCompanyProfile(resJson.data);
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching company profile:", err);
+        })
+        .finally(() => {
+          if ("scrollRestoration" in window.history) {
+            window.history.scrollRestoration = "manual";
+          }
+          window.scrollTo(0, 0);
+
+          setIsAuthorized(true);
+          setLoading(false);
+        });
     }
-    setLoading(false);
-  }, []);
+  }, [router]);
 
   // Prevent scroll saat mobile sidebar terbuka
   useEffect(() => {
@@ -139,7 +175,7 @@ export default function AdminLayout({ children }) {
   // Tandai satu notifikasi sudah dibaca
   const markAsRead = (id) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
     );
   };
 
@@ -147,7 +183,14 @@ export default function AdminLayout({ children }) {
   const handleLogout = () => {
     setLoading(true);
     setIsProfileDropdownOpen(false);
-    router.push("/login");
+
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("token_type");
+      localStorage.removeItem("user_level");
+    }
+
+    router.replace("/login_admin");
   };
 
   const navSections = [
@@ -250,6 +293,41 @@ export default function AdminLayout({ children }) {
     },
   ];
 
+  // Komponen Loader Global
+  const renderLoader = () => (
+    <div
+      className={`d-flex flex-column align-items-center justify-content-center ${
+        loading ? "opacity-100 pe-none-off" : "opacity-0 pe-none"
+      }`}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(255, 255, 255, 0.85)",
+        backdropFilter: "blur(6px)",
+        zIndex: 99999,
+        transition: "opacity 0.25s ease-in-out, visibility 0.25s",
+        visibility: loading ? "visible" : "hidden",
+      }}
+    >
+      <div
+        className="spinner-border text-primary mb-3"
+        role="status"
+        style={{ width: "2.8rem", height: "2.8rem", borderWidth: "0.22em" }}
+      >
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      <span className="fw-semibold text-secondary fs-6">Memuat Halaman...</span>
+    </div>
+  );
+
+  // Jika belum terotorisasi (sedang cek token / redirect), HANYA tampilkan loader tanpa UI admin
+  if (!isAuthorized) {
+    return renderLoader();
+  }
+
   return (
     <div className="min-vh-100" style={{ backgroundColor: "#eeeeee" }}>
       {/* Route listener untuk mematikan loading saat berpindah page */}
@@ -257,231 +335,10 @@ export default function AdminLayout({ children }) {
         <RouteChangeListener onRouteComplete={() => setLoading(false)} />
       </Suspense>
 
-      {/* ================= GLOBAL LOADING OVERLAY ================= */}
-      <div
-        className={`d-flex flex-column align-items-center justify-content-center ${
-          loading ? "opacity-100 pe-none-off" : "opacity-0 pe-none"
-        }`}
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100vw",
-          height: "100vh",
-          backgroundColor: "rgba(255, 255, 255, 0.85)",
-          backdropFilter: "blur(6px)",
-          zIndex: 99999,
-          transition: "opacity 0.25s ease-in-out, visibility 0.25s",
-          visibility: loading ? "visible" : "hidden",
-        }}
-      >
-        <div
-          className="spinner-border text-primary mb-3"
-          role="status"
-          style={{ width: "2.8rem", height: "2.8rem", borderWidth: "0.22em" }}
-        >
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <span className="fw-semibold text-secondary fs-6">
-          Memuat Halaman...
-        </span>
-      </div>
+      {/* GLOBAL LOADING OVERLAY */}
+      {renderLoader()}
 
-      <style jsx global>{`
-        html,
-        body {
-          max-width: 100vw;
-          overflow-x: hidden !important;
-        }
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
-        }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .syncara-dark-item {
-          color: rgba(255, 255, 255, 0.65) !important;
-          font-weight: 500;
-          font-size: 14px;
-          transition: all 0.2s ease-in-out;
-          border-radius: 10px !important;
-          background-color: transparent;
-          text-decoration: none;
-        }
-        .syncara-dark-item:hover {
-          background-color: rgba(255, 255, 255, 0.06) !important;
-          color: #ffffff !important;
-        }
-        .syncara-dark-item.active-syncara {
-          background-color: rgba(255, 255, 255, 0.1) !important;
-          color: #ffffff !important;
-          font-weight: 600;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-        .syncara-icon-box-dark {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 15px;
-          flex-shrink: 0;
-        }
-        .syncara-dark-item.active-syncara .syncara-icon-box-dark {
-          background-color: #2563eb;
-          color: #ffffff;
-        }
-        .syncara-dark-item:not(.active-syncara) .syncara-icon-box-dark {
-          background-color: rgba(255, 255, 255, 0.04);
-          color: rgba(255, 255, 255, 0.5);
-        }
-
-        /* Responsive Mobile Drawer Animation */
-        .mobile-drawer-backdrop {
-          position: fixed;
-          inset: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          backdrop-filter: blur(4px);
-          z-index: 1040;
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-            visibility 0.3s;
-        }
-        .mobile-drawer-backdrop.show {
-          opacity: 1;
-          visibility: visible;
-        }
-
-        .mobile-drawer-content {
-          position: fixed;
-          top: 0;
-          left: 0;
-          bottom: 0;
-          width: 280px;
-          max-width: 85vw;
-          background-color: #0a1128;
-          z-index: 1050;
-          transform: translateX(-100%);
-          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 4px 0 25px rgba(0, 0, 0, 0.3);
-        }
-        .mobile-drawer-content.show {
-          transform: translateX(0);
-        }
-
-        /* Profile & Notification Dropdown Animations */
-        .profile-dropdown-menu,
-        .notification-dropdown-menu {
-          position: absolute;
-          top: calc(100% + 10px);
-          right: 0;
-          background-color: #ffffff;
-          border-radius: 14px;
-          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.12),
-            0 8px 10px -6px rgba(0, 0, 0, 0.05);
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          z-index: 1000;
-          opacity: 0;
-          visibility: hidden;
-          transform: translateY(-8px) scale(0.96);
-          transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-            transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s;
-        }
-        .profile-dropdown-menu {
-          width: 210px;
-          padding: 8px 0;
-        }
-        .notification-dropdown-menu {
-          width: 380px;
-          max-width: 90vw;
-          padding: 0;
-          overflow: hidden;
-        }
-        .profile-dropdown-menu.show,
-        .notification-dropdown-menu.show {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(0) scale(1);
-        }
-
-        .dropdown-item-custom {
-          display: flex;
-          align-items: center;
-          padding: 9px 16px;
-          font-size: 13.5px;
-          color: #374151;
-          font-weight: 500;
-          text-decoration: none;
-          transition: background-color 0.15s ease, color 0.15s ease;
-          border: none;
-          background: transparent;
-          width: 100%;
-          text-align: left;
-          cursor: pointer;
-        }
-        .dropdown-item-custom:hover {
-          background-color: #f3f4f6;
-          color: #1d4ed8;
-        }
-        .dropdown-item-custom.danger:hover {
-          background-color: #fef2f2;
-          color: #dc2626;
-        }
-
-        /* FIX LEBAR & TINGGI SERAGAM UNTUK CARD NOTIFIKASI */
-        .notification-card {
-          width: 100% !important;
-          box-sizing: border-box !important;
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          border-radius: 12px;
-          padding: 10px 14px;
-          background-color: #ffffff;
-          transition: all 0.2s ease;
-          cursor: pointer;
-          display: flex;
-          gap: 12px;
-          align-items: center; /* Posisikan item tegak lurus di tengah */
-          min-height: 68px; /* Memaksa semua card memiliki tinggi yang persis sama */
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        .notification-card:hover {
-          background-color: #f8fafc;
-          border-color: rgba(37, 99, 235, 0.25);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
-        .notification-card.unread {
-          background-color: #f0f7ff;
-          border-color: rgba(37, 99, 235, 0.2);
-        }
-
-        /* Desktop Layout Wrapper Rules (280px) */
-        @media (min-width: 768px) {
-          .admin-sidebar-desktop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            width: 280px;
-            z-index: 1000;
-          }
-          .admin-content-wrapper {
-            margin-left: 280px;
-            width: calc(100% - 280px);
-          }
-        }
-        @media (max-width: 767.98px) {
-          .admin-content-wrapper {
-            width: 100%;
-            margin-left: 0;
-          }
-          .notification-dropdown-menu {
-            right: -50px;
-          }
-        }
-      `}</style>
+      <link rel="stylesheet" href="/css/dashboard.css" />
 
       {/* ================= ANIMATED MOBILE DRAWER ================= */}
       <div
@@ -535,13 +392,13 @@ export default function AdminLayout({ children }) {
               className="fw-bold mb-0 text-white text-truncate"
               style={{ fontSize: "14px" }}
             >
-              Nocsphere
+              {companyProfile?.nama_perusahaan || "Memuat..."}
             </h6>
             <span
               className="text-white-50 small text-truncate d-block"
               style={{ fontSize: "12px" }}
             >
-              admin@nocsphere.net
+              {companyProfile?.email || "Memuat..."}
             </span>
           </div>
         </div>
@@ -601,9 +458,7 @@ export default function AdminLayout({ children }) {
                 priority
               />
             ) : (
-              <h5 className="fw-bold mb-0 text-white text-center">
-                NOCSphere
-              </h5>
+              <h5 className="fw-bold mb-0 text-white text-center">NOCSphere</h5>
             )}
           </div>
 
@@ -840,10 +695,10 @@ export default function AdminLayout({ children }) {
                     className="fw-semibold text-dark"
                     style={{ fontSize: "14px" }}
                   >
-                    Nocpshere
+                    {companyProfile?.nama_perusahaan || "Memuat..."}
                   </div>
                   <div className="text-muted" style={{ fontSize: "12px" }}>
-                    Superadmin
+                    {companyProfile?.level || "Memuat..."}
                   </div>
                 </div>
                 <div
@@ -877,13 +732,13 @@ export default function AdminLayout({ children }) {
                     className="fw-semibold text-dark text-truncate"
                     style={{ fontSize: "13px" }}
                   >
-                    Nocsphere Admin
+                    {companyProfile?.nama_perusahaan || "Memuat..."}
                   </div>
                   <div
                     className="text-muted text-truncate"
                     style={{ fontSize: "11px" }}
                   >
-                    admin@nocsphere.net
+                    {companyProfile?.email || "Memuat..."}
                   </div>
                 </div>
 
