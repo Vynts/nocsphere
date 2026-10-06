@@ -1,5 +1,6 @@
 import asyncio
 import routeros_api
+from typing import List, Dict, Any
 from aiomysql import Connection, pool
 from fastapi import Depends
 from backend.schemas.router_schemas import RouterConnect
@@ -7,19 +8,77 @@ from backend.utils.security import get_current_perusahaan
 from werkzeug.security import generate_password_hash
 from config import database_connection
 
-# function untuk mengecek apakah router masih aktif atau tidak
-# Di backend (router.py)
-async def check_router_status(ip: str, port: int = 8728) -> str:
+async def get_single_router_bandwidth(router_item: dict) -> Dict[str, Any]:
+    """Helper async untuk mengeksekusi koneksi API router tanpa mengganggu event loop."""
+    host = router_item.get("ip_address") or router_item.get("host") or router_item.get("ip")
+    port = router_item.get("port") or 3237
+    user = router_item.get("username") or "admin"
+    password = router_item.get("password") or ""
+
+    if not host:
+        return {"status": "offline", "download_kbps": 0.0, "upload_kbps": 0.0}
+
+    # Menjalankan fungsi synchronous RouterOS API di threadpool agar backend tidak lag
+    return await asyncio.to_thread(
+        _fetch_routeros_traffic, 
+        host, 
+        port, 
+        user, 
+        password
+    )
+
+
+def _fetch_routeros_traffic(host: str, port: int, user: str, password: str) -> Dict[str, Any]:
+    """Fungsi pembantu synchronous untuk koneksi langsung ke MikroTik API."""
     try:
-        # Ubah timeout dari 1.0 ke 0.3 detik
+        connection = routeros_api.RouterOsApiPool(
+            host=host,
+            username=user,
+            password=password,
+            port=int(port),
+            plaintext_login=True
+        )
+        api = connection.get_api()
+        resource = api.get_resource('/interface')
+        
+        # Ambil monitor-traffic dari interface VPN SSTP
+        traffic_data = resource.call('monitor-traffic', {
+            'interface': 'vpn-remote-sstp-routereza',
+            'once': ''
+        })
+        connection.disconnect()
+
+        raw_rx = int(traffic_data[0].get('rx-bits-per-second', 0))
+        raw_tx = int(traffic_data[0].get('tx-bits-per-second', 0))
+
+        return {
+            "status": "online",
+            "download_kbps": round(raw_rx / 1000, 2),
+            "upload_kbps": round(raw_tx / 1000, 2)
+        }
+    except Exception:
+        return {"status": "offline", "download_kbps": 0.0, "upload_kbps": 0.0}
+
+# function untuk mengecek apakah router masih aktif atau tidak
+async def check_router_status(host: str, port: int = 8728) -> str:
+    if not host:
+        print("[DEBUG] Host bernilai None / Kosong!")
+        return "offline"
+        
+    try:
+        port = int(port)
+        print(f"[DEBUG] Mencoba connect ke {host}:{port} ...")
+        
         _, writer = await asyncio.wait_for(
-            asyncio.open_connection(ip, port), 
-            timeout=0.3
+            asyncio.open_connection(host, port), 
+            timeout=3.0
         )
         writer.close()
         await writer.wait_closed()
+        print(f"[DEBUG] Sukses connect ke {host}:{port} (ONLINE)")
         return "online"
-    except Exception:
+    except Exception as e:
+        print(f"[DEBUG Error Ping {host}:{port}]: {type(e).__name__} - {e}")
         return "offline"
 
 # mengambil data dari router

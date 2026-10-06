@@ -12,9 +12,20 @@ export default function RoutersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [bandwidthStats, setBandwidthStats] = useState({
+    total_routers: 0,
+    online_routers: 0,
+    offline_routers: 0,
+    avg_download_kbps: 0,
+    avg_upload_kbps: 0,
+    avg_download_mbps: 0,
+    avg_upload_mbps: 0,
+  });
+
   // State Filter & Pagination
   const [statusFilter, setStatusFilter] = useState("All Routers");
   const [sortFilter, setSortFilter] = useState("Newest");
+  const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
   // State Modal Router
@@ -42,6 +53,35 @@ export default function RoutersPage() {
     border: "1px solid #e2e8f0",
     boxShadow: "0 10px 15px -3px rgba(0,0,0,0.05)",
     padding: "6px",
+  };
+
+  // -------------------------------------------------------------
+  // Fetch Statistik Rata-Rata Bandwidth dari FastAPI
+  // -------------------------------------------------------------
+
+  const fetchBandwidthStats = async () => {
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      const response = await fetch(
+        "http://localhost:8000/api/router/bandwidth/avg",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setBandwidthStats(data);
+      }
+    } catch (err) {
+      console.error("Fetch Bandwidth Error:", err);
+    }
   };
 
   // -------------------------------------------------------------
@@ -89,10 +129,12 @@ export default function RoutersPage() {
   // -------------------------------------------------------------
   useEffect(() => {
     fetchRouters(true);
+    fetchBandwidthStats(true);
 
     const interval = setInterval(() => {
       if (document.visibilityState === "visible") {
         fetchRouters(false);
+        fetchBandwidthStats(false);
       }
     }, 10000);
 
@@ -136,6 +178,22 @@ export default function RoutersPage() {
       const idB = b.id_router || b.id || 0;
       return sortFilter === "Newest" ? idB - idA : idA - idB;
     });
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, sortFilter, perPage]);
+
+  // Hitung Indeks & Data yang Ditampilkan Per Halaman
+  const totalItems = filteredRouters.length;
+  const totalPages = Math.ceil(totalItems / perPage) || 1;
+  const indexOfLastItem = currentPage * perPage;
+  const indexOfFirstItem = indexOfLastItem - perPage;
+
+  // Data router yang sudah di-slice sesuai halaman aktif
+  const paginatedRouters = filteredRouters.slice(
+    indexOfFirstItem,
+    indexOfLastItem,
+  );
 
   // -------------------------------------------------------------
   // 4. Modal Handlers
@@ -316,7 +374,9 @@ export default function RoutersPage() {
                     <i className="bi bi-arrow-up-right fs-6"></i>
                   </div>
                 </div>
-                <h3 className="fw-bold text-dark mb-1 fs-4">342.5 Mbps</h3>
+                <h3 className="fw-bold text-dark mb-1 fs-4">
+                  {bandwidthStats.avg_upload_kbps} Kbps
+                </h3>
                 <span className="text-muted small" style={{ fontSize: "12px" }}>
                   Rata-rata trafik keluar dari semua router
                 </span>
@@ -336,7 +396,9 @@ export default function RoutersPage() {
                     <i className="bi bi-arrow-down-left fs-6"></i>
                   </div>
                 </div>
-                <h3 className="fw-bold text-dark mb-1 fs-4">1.28 Gbps</h3>
+                <h3 className="fw-bold text-dark mb-1 fs-4">
+                  {bandwidthStats.avg_download_kbps} Kbps
+                </h3>
                 <span className="text-muted small" style={{ fontSize: "12px" }}>
                   Rata-rata trafik masuk dari semua router
                 </span>
@@ -387,9 +449,8 @@ export default function RoutersPage() {
                         Memuat data router...
                       </td>
                     </tr>
-                  ) : filteredRouters.length > 0 ? (
-                    filteredRouters.map((router, index) => {
-                      // Safe fallback untuk ID, Name, Host, & Status
+                  ) : paginatedRouters.length > 0 ? (
+                    paginatedRouters.map((router, index) => {
                       const routerId =
                         router.id_router || router.id || `router-${index}`;
                       const routerName =
@@ -412,7 +473,12 @@ export default function RoutersPage() {
                             className="py-3 text-dark fw-semibold text-nowrap"
                             style={{ fontSize: "13px" }}
                           >
-                            <a className="text-decoration-none" href={`http://${routerHost}:${router.port || 80}`} target="_blank" rel="noopener noreferrer">
+                            <a
+                              className="text-decoration-none"
+                              href={`http://${routerHost}:${router.port || 80}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               {routerHost}
                             </a>
                           </td>
@@ -467,7 +533,7 @@ export default function RoutersPage() {
                                 <i className="bi bi-trash-fill fs-6"></i>
                               </button>
 
-                              {/* Detail Link Page Button (Menggunakan Link dari next/link) */}
+                              {/* Detail Link Page Button */}
                               <Link
                                 href={`/admin/routers/${routerId}`}
                                 className="btn btn-sm btn-link text-secondary p-1 text-decoration-none d-inline-flex align-items-center"
@@ -496,24 +562,40 @@ export default function RoutersPage() {
 
             {/* Pagination & Per Page Footer */}
             <div className="p-3 p-sm-4 border-top d-flex align-items-center justify-content-between flex-wrap gap-3">
-              <div className="d-flex align-items-center gap-2">
-                <span className="text-muted small">Per page</span>
-                <select
-                  className="form-select form-select-sm bg-white border rounded-3 text-secondary fw-semibold shadow-none"
-                  value={perPage}
-                  onChange={(e) => setPerPage(Number(e.target.value))}
-                  style={{ width: "70px", borderColor: "#cbd5e1" }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                </select>
+              <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-2">
+                  <span className="text-muted small">Per page</span>
+                  <select
+                    className="form-select form-select-sm bg-white border rounded-3 text-secondary fw-semibold shadow-none"
+                    value={perPage}
+                    onChange={(e) => setPerPage(Number(e.target.value))}
+                    style={{ width: "70px", borderColor: "#cbd5e1" }}
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+
+                {/* Informasi Jumlah Data yang Ditampilkan */}
+                <span className="text-muted small">
+                  Showing {totalItems > 0 ? indexOfFirstItem + 1 : 0} -{" "}
+                  {Math.min(indexOfLastItem, totalItems)} of {totalItems} items
+                </span>
               </div>
 
+              {/* Tombol Previous / Next & Info Halaman */}
               <div className="d-flex align-items-center gap-2">
+                <span className="text-muted small me-2">
+                  Page {currentPage} of {totalPages}
+                </span>
+
                 <button
                   className="btn btn-sm btn-light border rounded-3 fw-semibold text-secondary px-3 py-1 shadow-none"
-                  disabled
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1 || loading}
                   style={{ borderColor: "#cbd5e1" }}
                 >
                   <i
@@ -522,9 +604,13 @@ export default function RoutersPage() {
                   ></i>{" "}
                   Previous
                 </button>
+
                 <button
                   className="btn btn-sm btn-light border rounded-3 fw-semibold text-secondary px-3 py-1 shadow-none"
-                  disabled
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage >= totalPages || loading}
                   style={{ borderColor: "#cbd5e1" }}
                 >
                   Next{" "}

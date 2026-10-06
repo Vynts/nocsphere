@@ -76,20 +76,20 @@ export default function AddRouterPage() {
               
               {/* Section 1: Identitas Router */}
               <div className="mb-4 pb-3 border-bottom">
-                <h6 className="fw-bold text-dark mb-1 fs-6">1. Identitas Router</h6>
+                <h6 className="fw-bold text-dark mb-1 fs-6">Identitas Router</h6>
                 <p className="text-muted extra-small mb-3" style={{ fontSize: "13px" }}>
                   Informasi dasar nama dan lokasi pemasangan perangkat.
                 </p>
 
                 <div className="row g-3">
-                  <div className="col-12 col-md-6">
+                  <div className="col-12 col-md-12">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      NAMA ROUTER / IDENTITY <span className="text-danger">*</span>
+                      Label Router <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control rounded-3 py-2 px-3 shadow-none border-1"
-                      placeholder="e.g. CCR1009 - Main Gateway"
+                      placeholder="Masukan Nama Router / Lokasi Pemasangan"
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
@@ -97,27 +97,12 @@ export default function AddRouterPage() {
                       required
                     />
                   </div>
-
-                  <div className="col-12 col-md-6">
-                    <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      LOKASI / SEKTOR
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control rounded-3 py-2 px-3 shadow-none border-1"
-                      placeholder="e.g. Tower Server Natar"
-                      name="location"
-                      value={formData.location}
-                      onChange={handleChange}
-                      style={{ fontSize: "14px", borderColor: "#cbd5e1" }}
-                    />
-                  </div>
                 </div>
               </div>
 
               {/* Section 2: Koneksi & Jaringan */}
               <div className="mb-4 pb-3 border-bottom">
-                <h6 className="fw-bold text-dark mb-1 fs-6">2. Koneksi & Network</h6>
+                <h6 className="fw-bold text-dark mb-1 fs-6">Koneksi & Network</h6>
                 <p className="text-muted extra-small mb-3" style={{ fontSize: "13px" }}>
                   Tentukan bagaimana sistem dapat mengakses API MikroTik.
                 </p>
@@ -125,7 +110,7 @@ export default function AddRouterPage() {
                 <div className="row g-3">
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      TIPE KONEKSI / TUNNEL <span className="text-danger">*</span>
+                      Tiper Koneksi / Tunnel <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select rounded-3 py-2 px-3 shadow-none fw-semibold border-1"
@@ -145,12 +130,12 @@ export default function AddRouterPage() {
 
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      IP ADDRESS / HOST <span className="text-danger">*</span>
+                      IP Address / Host <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
-                      className="form-control rounded-3 py-2 px-3 font-monospace shadow-none border-1"
-                      placeholder="103.150.20.1"
+                      className="form-control rounded-3 py-2 px-3 shadow-none border-1"
+                      placeholder="Masukan IP Publik / Domain MikroTik"
                       name="ip"
                       value={formData.ip}
                       onChange={handleChange}
@@ -206,7 +191,7 @@ export default function AddRouterPage() {
 
               {/* Section 3: Kredensial API MikroTik */}
               <div className="mb-4 pb-3 border-bottom">
-                <h6 className="fw-bold text-dark mb-1 fs-6">3. Kredensial API RouterOS</h6>
+                <h6 className="fw-bold text-dark mb-1 fs-6">Kredensial API RouterOS</h6>
                 <p className="text-muted extra-small mb-3" style={{ fontSize: "13px" }}>
                   Username dan password user API yang terdaftar di MikroTik.
                 </p>
@@ -214,7 +199,7 @@ export default function AddRouterPage() {
                 <div className="row g-3">
                   <div className="col-12 col-md-4">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      PORT API <span className="text-danger">*</span>
+                      Port API <span className="text-danger">*</span>
                     </label>
                     <input
                       type="number"
@@ -230,7 +215,7 @@ export default function AddRouterPage() {
 
                   <div className="col-12 col-md-4">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      API USERNAME <span className="text-danger">*</span>
+                      Username Mikrotik <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
@@ -246,7 +231,7 @@ export default function AddRouterPage() {
 
                   <div className="col-12 col-md-4">
                     <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
-                      API PASSWORD <span className="text-danger">*</span>
+                      Password Mikrotik <span className="text-danger">*</span>
                     </label>
                     <input
                       type="password"
@@ -259,6 +244,47 @@ export default function AddRouterPage() {
                       required
                     />
                   </div>
+                </div>
+              </div>
+
+              <div className="mb-4 pb-3 border-bottom">
+                <h6 className="fw-bold text-dark mb-1 fs-6">Lokasi Router</h6>
+                <p className="text-muted extra-small mb-3" style={{ fontSize: "13px" }}>
+                  Latitude dan longitude lokasi router.
+                </p>
+
+                <div className="row g-3">
+                  <div className="col-12 col-md-6">
+                    <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
+                      Latitude
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control rounded-3 py-2 px-3 shadow-none border-1"
+                      placeholder="Masukan Latitude Lokasi Router"
+                      name="latitude"
+                      value={formData.latitude}
+                      onChange={handleChange}
+                      style={{ fontSize: "14px", borderColor: "#cbd5e1" }}
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6">
+                    <label className="form-label fw-semibold text-secondary extra-small mb-1" style={{ fontSize: "12px" }}>
+                      Longitude
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control rounded-3 py-2 px-3 shadow-none border-1"
+                      placeholder="Masukan Longitude Lokasi Router"
+                      name="longitude"
+                      value={formData.longitude}
+                      onChange={handleChange}
+                      style={{ fontSize: "14px", borderColor: "#cbd5e1" }}
+                    />
+                  </div>
+
+                  
                 </div>
               </div>
 

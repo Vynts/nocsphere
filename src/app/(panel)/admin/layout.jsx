@@ -403,7 +403,7 @@ export default function AdminLayout({ children }) {
           </div>
         </div>
 
-        <div className="p-3 flex-grow-1 overflow-y-auto no-scrollbar">
+        <div className="p-3 flex-grow-1 overflow-y-auto no-scrollbar scroll-isolated">
           {navSections.map((section) => (
             <div key={section.title} className="mb-3">
               <div
@@ -462,7 +462,7 @@ export default function AdminLayout({ children }) {
             )}
           </div>
 
-          <div className="overflow-y-auto no-scrollbar flex-grow-1 pe-1">
+          <div className="overflow-y-auto no-scrollbar flex-grow-1 pe-1 scroll-isolated">
             {navSections.map((section) => (
               <div key={section.title} className="mb-3">
                 <div
@@ -601,7 +601,7 @@ export default function AdminLayout({ children }) {
 
                 {/* List Notifikasi Berbentuk Card (Tinggi & Lebar Sama Persis) */}
                 <div
-                  className="overflow-y-auto no-scrollbar p-3 d-flex flex-column align-items-stretch gap-2"
+                  className="overflow-y-auto no-scrollbar p-3 d-flex flex-column align-items-stretch gap-2 scroll-isolated"
                   style={{ maxHeight: "350px", backgroundColor: "#f8fafc" }}
                 >
                   {filteredNotifications.length > 0 ? (

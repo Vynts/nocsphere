@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 // Dynamic import Leaflet untuk Next.js SSR
 const MapContainer = dynamic(
@@ -22,11 +23,15 @@ const Popup = dynamic(() => import("react-leaflet").then((mod) => mod.Popup), {
 });
 
 export default function NetworkMapsPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("routers");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
   const [leafletLoaded, setLeafletLoaded] = useState(false);
   const [L, setL] = useState(null);
+  const [routers, setRouters] = useState([]);
+  const [routerLoading, setRouterLoading] = useState(true);
+  const [routerError, setRouterError] = useState(null);
 
   // State Pagination Pelanggan
   const [customerPage, setCustomerPage] = useState(1);
@@ -41,41 +46,107 @@ export default function NetworkMapsPage() {
     });
   }, []);
 
+  useEffect(() => {
+    let isMounted = true;
+    let requestInFlight = false;
+
+    const loadRouters = async (showLoadingState = false) => {
+      if (requestInFlight) return;
+      requestInFlight = true;
+
+      try {
+        if (showLoadingState && isMounted) setRouterLoading(true);
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          router.replace("/login_admin");
+          return;
+        }
+
+        const response = await fetch("http://localhost:8000/api/router/list", {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 401) {
+          router.replace("/login_admin");
+          throw new Error("Sesi telah berakhir. Silakan login ulang.");
+        }
+        if (!response.ok) {
+          throw new Error(
+            `Gagal mengambil data router. Status: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          throw new Error("Format data router dari server tidak valid.");
+        }
+
+        const normalizedRouters = data.map((item) => {
+          const parseCoordinate = (value) => {
+            if (value === null || value === undefined || value === "") {
+              return null;
+            }
+            const coordinate = Number(value);
+            return Number.isFinite(coordinate) ? coordinate : null;
+          };
+          const latitude = parseCoordinate(item.latitude ?? item.lat);
+          const longitude = parseCoordinate(item.longitude ?? item.lng);
+          const hasValidCoordinates =
+            latitude !== null &&
+            longitude !== null &&
+            latitude >= -90 &&
+            latitude <= 90 &&
+            longitude >= -180 &&
+            longitude <= 180;
+          return {
+            id: String(item.id_router ?? item.id),
+            name: item.label_router || item.name || "Router tanpa nama",
+            ip: item.host || item.ip || "-",
+            status:
+              String(item.status || "").toLowerCase() === "online"
+                ? "Online"
+                : "Offline",
+            lat: hasValidCoordinates ? latitude : null,
+            lng: hasValidCoordinates ? longitude : null,
+          };
+        });
+
+        if (isMounted) {
+          setRouters(normalizedRouters);
+          setRouterError(null);
+        }
+      } catch (err) {
+        console.error("Fetch Router Error:", err);
+        if (isMounted) {
+          setRouterError(
+            err instanceof Error ? err.message : "Gagal mengambil data router.",
+          );
+        }
+      } finally {
+        requestInFlight = false;
+        if (showLoadingState && isMounted) setRouterLoading(false);
+      }
+    };
+
+    loadRouters(true);
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") loadRouters();
+    }, 10000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [router]);
+
   // Reset page pelanggan ke 1 jika query pencarian atau tab berubah
   useEffect(() => {
     setCustomerPage(1);
   }, [searchQuery, activeTab]);
-
-  // Mock Data Routers
-  const routers = [
-    {
-      id: "r1",
-      name: "CCR1009 - Main Gateway",
-      ip: "103.150.20.1",
-      status: "Online",
-      lat: -5.3972,
-      lng: 105.2663,
-      totalClients: 142,
-    },
-    {
-      id: "r2",
-      name: "RB3011 - Tower Sektor A",
-      ip: "103.150.20.2",
-      status: "Online",
-      lat: -5.385,
-      lng: 105.258,
-      totalClients: 85,
-    },
-    {
-      id: "r3",
-      name: "RB750Gr3 - Sektor B (Natar)",
-      ip: "103.150.20.5",
-      status: "Offline",
-      lat: -5.335,
-      lng: 105.208,
-      totalClients: 0,
-    },
-  ];
 
   // Mock Data Pelanggan
   const customers = [
@@ -183,13 +254,16 @@ export default function NetworkMapsPage() {
   const filteredRouters = routers.filter(
     (r) =>
       r.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.ip.includes(searchQuery),
+      r.ip.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       c.package.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+  const mappedRouters = routers.filter(
+    (item) => item.lat !== null && item.lng !== null,
   );
 
   // Pagination Logic Pelanggan
@@ -278,7 +352,15 @@ export default function NetworkMapsPage() {
                 className="d-flex flex-column gap-2 overflow-y-auto pe-1"
                 style={{ maxHeight: "280px" }}
               >
-                {activeTab === "routers" ? (
+                {activeTab === "routers" && routerLoading ? (
+                  <span className="text-muted text-center py-3 extra-small">
+                    Memuat data router...
+                  </span>
+                ) : activeTab === "routers" && routerError ? (
+                  <span className="text-danger text-center py-3 extra-small">
+                    {routerError}
+                  </span>
+                ) : activeTab === "routers" ? (
                   filteredRouters.length > 0 ? (
                     filteredRouters.map((r) => (
                       <div
@@ -309,7 +391,11 @@ export default function NetworkMapsPage() {
                           style={{ fontSize: "11px" }}
                         >
                           <span className="font-monospace">{r.ip}</span>
-                          <span>{r.totalClients} Pelanggan</span>
+                          <span className="text-truncate ms-2">
+                            {r.lat === null || r.lng === null
+                              ? "Koordinat belum tersedia"
+                              : `${r.lat}, ${r.lng}`}
+                          </span>
                         </div>
                       </div>
                     ))
@@ -511,7 +597,7 @@ export default function NetworkMapsPage() {
                     <div className="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light-subtle border border-light-subtle">
                       <div className="d-flex align-items-center gap-2">
                         <div
-                          className="d-flex align-items-center justify-content-center rounded-circle bg-warning text-dark shadow-sm"
+                          className="d-flex align-items-center justify-content-center rounded-circle bg-warning text-white shadow-sm"
                           style={{
                             width: "24px",
                             height: "24px",
@@ -578,7 +664,8 @@ export default function NetworkMapsPage() {
                   className="text-muted extra-small"
                   style={{ fontSize: "12px" }}
                 >
-                  Terhubung dengan 3 Routers & 142 Pelanggan
+                  {routers.length} router terdaftar · {mappedRouters.length}{" "}
+                  memiliki koordinat
                 </span>
               </div>
             </div>
@@ -590,18 +677,29 @@ export default function NetworkMapsPage() {
             >
               {leafletLoaded ? (
                 <MapContainer
-                  center={[-5.38, 105.25]}
+                  key={
+                    mappedRouters
+                      .map((item) => `${item.id}:${item.lat}:${item.lng}`)
+                      .join("|") || "default-map-center"
+                  }
+                  center={
+                    mappedRouters.length > 0
+                      ? [mappedRouters[0].lat, mappedRouters[0].lng]
+                      : [-5.38, 105.25]
+                  }
                   zoom={13}
                   style={{ width: "100%", height: "100%" }}
                   scrollWheelZoom={true}
                 >
                   <TileLayer
-                    url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                    attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+                    url={`https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=${process.env.NEXT_PUBLIC_LEAFLET_API_KEY}`}
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    subdomains="abcd"
+                    maxZoom={20}
                   />
 
                   {/* Render Router Markers */}
-                  {routers.map((r) => (
+                  {mappedRouters.map((r) => (
                     <Marker
                       key={r.id}
                       position={[r.lat, r.lng]}
@@ -674,6 +772,12 @@ export default function NetworkMapsPage() {
                 </div>
               )}
             </div>
+            {!routerLoading && mappedRouters.length < routers.length && (
+              <div className="alert alert-warning mt-3 mb-0 py-2 extra-small">
+                {routers.length - mappedRouters.length} router belum memiliki
+                koordinat valid, sehingga belum ditampilkan di peta.
+              </div>
+            )}
           </div>
         </div>
       </div>

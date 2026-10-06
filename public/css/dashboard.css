@@ -10,24 +10,26 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+.scroll-isolated {
+  overscroll-behavior-y: contain;
+}
 .syncara-dark-item {
   color: rgba(255, 255, 255, 0.65) !important;
   font-weight: 500;
   font-size: 14px;
-  transition: all 0.2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
   border-radius: 10px !important;
   background-color: transparent;
   text-decoration: none;
 }
 .syncara-dark-item:hover {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(0, 0, 0, 0.18) !important;
   color: #ffffff !important;
 }
 .syncara-dark-item.active-syncara {
-  background-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(0, 0, 0, 0.24) !important;
   color: #ffffff !important;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 .syncara-icon-box-dark {
   width: 32px;
@@ -40,8 +42,8 @@ body {
   flex-shrink: 0;
 }
 .syncara-dark-item.active-syncara .syncara-icon-box-dark {
-  background-color: #2563eb;
-  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
 }
 .syncara-dark-item:not(.active-syncara) .syncara-icon-box-dark {
   background-color: rgba(255, 255, 255, 0.04);
