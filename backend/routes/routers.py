@@ -42,6 +42,46 @@ async def get_router_by_id(id_router: int, current_id: int = Depends(get_current
             detail=f"Database Error! {e}"
         )
 
+@router.get("/test", response_model=dict)
+async def test_router_connection(
+    host: str,
+    port: int = 8728,
+    username_router: str | None = None,
+    password_router: str = "",
+):
+    connection = None
+    try:
+        router_data = RouterConnect(
+            host=host,
+            username_router=username_router,
+            password_router=password_router,
+            port=port,
+        )
+
+        # 1. Inisialisasi pool koneksi
+        connection = connect_to_router(data=router_data)
+
+        # 2. Memaksa login & autentikasi ke RouterOS API
+        api = connection.get_api()
+
+        return {
+            "status": "success",
+            "message": f"Berhasil terhubung ke router {host}:{port}",
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Gagal terhubung ke Router: {str(e)}",
+        )
+    finally:
+        # Selalu tutup koneksi jika pernah dibuka
+        if connection and hasattr(connection, "disconnect"):
+            try:
+                connection.disconnect()
+            except Exception:
+                pass
+
 @router.get("/list", response_model=List[RouterResponse])  # Gunakan List[...] jika return array
 async def get_router(
     current_id: int = Depends(get_current_perusahaan), 
@@ -181,7 +221,7 @@ async def add_router(
                     username=data.username_router,
                     password=data.password_router,
                     port=int(data.port) if data.port else 8728,
-                    timeout=10
+                    plaintext_login=True,
                 )
                 api = connection.get_api()
 
@@ -220,28 +260,36 @@ async def add_router(
                 if secrets_data:
                     query_pppoe = """
                         INSERT INTO tbl_pelanggan 
-                        (nama_pelanggan, username_pppoe, password_pppoe, service, id_paket, remote_address, id_router)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        (nama_pelanggan, username_pppoe, password_pppoe, id_paket, remote_address, mac_address, id_router, id_perusahaan)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     """
                     
                     pppoe_payload = []
                     for secret in secrets_data:
-                        secret_name = secret.get('name')
-                        secret_profile = secret.get('profile')
+                        service_type = secret.get('service', 'pppoe')
 
-                        id_paket = profile_map.get(secret_profile, None)
+                        # Filter hanya pppoe atau any
+                        if service_type in ['pppoe', 'any']:
+                            secret_name = secret.get('name')
+                            secret_profile = secret.get('profile')
+                            id_paket = profile_map.get(secret_profile, None)
+                            
+                            # Di MikroTik RouterOS API, MAC address disimpan di properti 'caller-id'
+                            mac_address = secret.get('caller-id', None)
 
-                        pppoe_payload.append((
-                            secret_name,                          # nama_pelanggan
-                            secret_name,                          # username_pppoe
-                            secret.get('password', ''),           # password_pppoe
-                            secret.get('service', 'pppoe'),       # service
-                            id_paket,                             # id_paket (Foreign Key ke tbl_paket)
-                            secret.get('remote-address', None),   # remote_address
-                            router_id,                            # id_router
-                        ))
+                            pppoe_payload.append((
+                                secret_name,                          # nama_pelanggan
+                                secret_name,                          # username_pppoe
+                                secret.get('password', ''),           # password_pppoe
+                                id_paket,                             # id_paket (FK ke tbl_paket)
+                                secret.get('remote-address', None),   # remote_address
+                                mac_address,                          # mac_address (caller-id)
+                                router_id,                            # id_router
+                                current_id                            # id_perusahaan
+                            ))
 
-                    await cursor.executemany(query_pppoe, pppoe_payload)
+                    if pppoe_payload:
+                        await cursor.executemany(query_pppoe, pppoe_payload)
 
                 connection.disconnect()
 
@@ -259,7 +307,7 @@ async def add_router(
         return {
             "status": "success",
             "message": "Router, Paket, & Data PPPoE Berhasil Ditambahkan!",
-            "redirect_to": "/router"
+            "redirect_to": "/admin/routers"
         }
 
     except HTTPException as e:

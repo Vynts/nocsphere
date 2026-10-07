@@ -109,7 +109,6 @@ export default function RoutersPage() {
       if (!response.ok) {
         if (response.status === 401) {
           router.replace("/login_admin");
-          throw new Error("Sesi telah berakhir. Silakan login ulang.");
         }
         throw new Error(`Gagal mengambil data. Status: ${response.status}`);
       }

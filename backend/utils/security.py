@@ -40,7 +40,10 @@ async def get_current_perusahaan(credentials: HTTPAuthorizationCredentials = Dep
         id_perusahaan: int = payload.get("id_perusahaan")
         
         if id_perusahaan is None:
-            raise "tidak ada data perusahaan"
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="tidak ada data perusahaan"
+            )
             
         return id_perusahaan
         
@@ -50,4 +53,7 @@ async def get_current_perusahaan(credentials: HTTPAuthorizationCredentials = Dep
             detail="Token login sudah kedaluwarsa, silakan login ulang!"
         )
     except jwt.InvalidTokenError:
-        raise "invalid"
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token tidak valid, silakan login kembali!"
+        )

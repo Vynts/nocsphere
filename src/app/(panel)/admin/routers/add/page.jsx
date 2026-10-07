@@ -3,8 +3,10 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AddRouterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -18,6 +20,10 @@ export default function AddRouterPage() {
     password: "",
     autoIsolir: true,
   });
+
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [message, setMessage] = useState("");
 
   const cardCleanStyle = {
     backgroundColor: "#ffffff",
@@ -34,9 +40,98 @@ export default function AddRouterPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleTestConnection = async (e) => {
     e.preventDefault();
-    console.log("Submitting new router data:", formData);
+    setLoading(true);
+    setErrorMessage("");
+    setMessage("");
+
+    const token = localStorage.getItem("access_token");
+
+    if (!token || token === "null" || token === "undefined") {
+      setErrorMessage("Anda belum login atau sesi telah berakhir.");
+      return;
+    }
+
+    const payload = {
+      host: formData.ip,
+      port: formData.apiPort,
+      username_router: formData.username,
+      password_router: formData.password,
+    };
+
+    try {
+      const queryParams = new URLSearchParams(payload).toString();
+
+      const response = await fetch(`http://localhost:8000/api/router/test?${queryParams}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.detail || "Gagal menguji koneksi router");
+      }
+
+      setMessage("Koneksi Berhasil. Router dapat diakses melalui API MikroTik.");
+    } catch (err) {
+      setErrorMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMessage("");
+
+    const token = localStorage.getItem("access_token"); 
+
+    if (!token || token === "null" || token === "undefined") {
+      setErrorMessage("Anda belum login atau sesi telah berakhir.");
+      return;
+    }
+
+    const payload = {
+      label_router: formData.name,
+      host: formData.ip,
+      port: formData.apiPort,
+      username_router: formData.username,
+      password_router: formData.password,
+      latitude: formData.latitude,
+      longitude: formData.longitude,
+    };
+
+    try {
+      const response = await fetch("http://localhost:8000/api/router/add", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+
+        
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok) {
+        // Jika response status 400 / 500, lempar error message dari detail FastAPI
+        throw new Error(resData.detail || "Gagal menambahkan router");
+      }
+
+      router.push(resData.redirect_to || "/admin/routers"); // Redirect ke halaman router
+
+    } catch (err) {
+      setErrorMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -241,7 +336,6 @@ export default function AddRouterPage() {
                       value={formData.password}
                       onChange={handleChange}
                       style={{ fontSize: "14px", borderColor: "#cbd5e1" }}
-                      required
                     />
                   </div>
                 </div>
@@ -317,6 +411,18 @@ export default function AddRouterPage() {
                 </div>
               </div>
 
+              {message && (
+                <div className="alert alert-success rounded-3 mb-4" role="alert">
+                  {message}
+                </div>
+              )}
+
+              {errorMessage && (
+                <div className="alert alert-danger rounded-3 mb-4" role="alert">
+                  {errorMessage}
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="d-flex align-items-center justify-content-end gap-2 pt-2">
                 <Link
@@ -326,6 +432,14 @@ export default function AddRouterPage() {
                 >
                   Batal
                 </Link>
+                <button
+                  type="submit"
+                  className="btn btn-outline-primary rounded-3 fw-semibold px-4 py-2 shadow-none d-flex align-items-center gap-2"
+                  onClick={handleTestConnection}
+                  style={{ fontSize: "14px" }}
+                >
+                  <span>Tes Koneksi</span>
+                </button>
                 <button
                   type="submit"
                   className="btn btn-primary rounded-3 fw-semibold px-4 py-2 shadow-none d-flex align-items-center gap-2"
