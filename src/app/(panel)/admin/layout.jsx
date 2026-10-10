@@ -220,6 +220,23 @@ export default function AdminLayout({ children }) {
       ],
     },
     {
+      title: "Billing & Clients",
+      items: [
+        {
+          label: "Pelanggan",
+          path: "/admin/pelanggan",
+          icon: "bi-people-fill",
+        },
+        { label: "Paket", path: "/admin/paket", icon: "bi-box-seam-fill" },
+        {
+          label: "Invoice",
+          path: "/admin/invoices",
+          icon: "bi-receipt-cutoff",
+        },
+        { label: "Isolir", path: "/admin/isolir", icon: "bi-person-fill-lock" },
+      ],
+    },
+    {
       title: "PPPoE Management",
       items: [
         {
@@ -237,23 +254,6 @@ export default function AdminLayout({ children }) {
           path: "/admin/pppoe/profile",
           icon: "bi-boxes",
         },
-      ],
-    },
-    {
-      title: "Billing & Clients",
-      items: [
-        {
-          label: "Pelanggan",
-          path: "/admin/pelanggan",
-          icon: "bi-people-fill",
-        },
-        { label: "Paket", path: "/admin/paket", icon: "bi-box-seam-fill" },
-        {
-          label: "Invoice",
-          path: "/admin/invoices",
-          icon: "bi-receipt-cutoff",
-        },
-        { label: "Isolir", path: "/admin/isolir", icon: "bi-person-fill-lock" },
       ],
     },
     {

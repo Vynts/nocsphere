@@ -2,7 +2,8 @@ import asyncio
 from typing import List
 from config import database_connection
 import routeros_api
-from fastapi import APIRouter, Depends, HTTPException, status, WebSocket, WebSocketDisconnect
+from fastapi.concurrency import run_in_threadpool
+from fastapi import APIRouter, Depends, Query, HTTPException, status, WebSocket, WebSocketDisconnect
 from backend.schemas.router_schemas import RouterCreate, RouterResponse, RouterUpdate, RouterConnect, ProfileCreate
 from backend.utils.security import generate_password_hash, check_password_hash, get_current_perusahaan
 from backend.utils.routers import get_active, get_profile, get_secret, add_profile, edit_profile, delete_profile, connect_to_router, check_router_status, get_single_router_bandwidth, _fetch_routeros_traffic
@@ -14,33 +15,171 @@ router = APIRouter(
 )
 
 # route untuk melihat data router yang akan dipakai sebagai penggambilan data
+@router.get("", response_model=dict)
+async def get_router_by_id(
+    id_router: int,
+    interface_name: str = Query(
+        "ether1-WAN", description="Nama interface router yang ingin dipantau"
+    ),
+    current_id: int = Depends(get_current_perusahaan),
+    conn: Connection = Depends(database_connection),
+):
+    # 1. Ambil Data Router dari Database
+    async with conn.cursor() as cursor:
+        # Sebutkan kolom secara eksplisit agar aman untuk dict maupun tuple
+        await cursor.execute(
+            """
+            SELECT host, username_router, password_router, port, label_router 
+            FROM tbl_router 
+            WHERE id_router = %s AND id_perusahaan = %s
+            """,
+            (id_router, current_id),
+        )
+        router_row = await cursor.fetchone()
 
-@router.get("")
-async def get_router_by_id(id_router: int, current_id: int = Depends(get_current_perusahaan), conn: Connection = Depends(database_connection)):
-    try:
-        async with conn.cursor() as cursor:
-            await cursor.execute("SELECT * FROM tbl_router WHERE id_router = %s AND id_perusahaan = %s", (id_router, current_id))
-            router_list = await cursor.fetchone()
+    if not router_row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Router dengan ID {id_router} tidak ditemukan.",
+        )
 
-            router = RouterConnect(
-                host=router_list['host'],
-                username_router=router_list['username_router'],
-                password_router=router_list['password_router'],
-                port=router_list['port']
+    # Parsing data database (Aman untuk DictCursor maupun Tuple Cursor)
+    if isinstance(router_row, dict):
+        host = router_row.get("host")
+        username = router_row.get("username_router")
+        password = router_row.get("password_router")
+        port = int(router_row.get("port", 8728))
+        label_router = router_row.get("label_router", "N/A")
+    else:
+        host, username, password, port, label_router = (
+            router_row[0],
+            router_row[1],
+            router_row[2],
+            int(router_row[3]),
+            router_row[4] if len(router_row) > 4 else "N/A",
+        )
+
+    # 2. Fungsi Synchronous untuk Komunikasi dengan MikroTik Router
+    def fetch_mikrotik_data():
+        router_data = RouterConnect(
+            host=host, username_router=username, password_router=password, port=port
+        )
+        connection = connect_to_router(data=router_data)
+
+        try:
+            api = connection.get_api()
+
+            # Ambil System Resource (/system/resource)
+            resource_api = api.get_resource("/system/resource")
+            resource_raw = resource_api.get()
+            resource_data = resource_raw[0] if resource_raw else {}
+
+            cpu_load = int(resource_data.get("cpu-load", 0))
+
+            total_ram = int(resource_data.get("total-memory", 0))
+            free_ram = int(resource_data.get("free-memory", 0))
+            used_ram = total_ram - free_ram
+            ram_percent = (
+                round((used_ram / total_ram) * 100, 2) if total_ram > 0 else 0.0
             )
 
-            connection = connect_to_router(data=router)
+            total_disk = int(resource_data.get("total-hdd-space", 0))
+            free_disk = int(resource_data.get("free-hdd-space", 0))
+            used_disk = total_disk - free_disk
+            disk_percent = (
+                round((used_disk / total_disk) * 100, 2) if total_disk > 0 else 0.0
+            )
 
-            return connection
+            # Ambil Traffic Bandwidth (/interface monitor-traffic)
+            interface_api = api.get_resource("/interface")
+            traffic_raw = interface_api.call(
+                "monitor-traffic", {"interface": interface_name, "once": ""}
+            )
+            traffic_data = traffic_raw[0] if traffic_raw else {}
 
-    except HTTPException as e:
-        raise e
+            rx_bps = int(traffic_data.get("rx-bits-per-second", 0))
+            tx_bps = int(traffic_data.get("tx-bits-per-second", 0))
+
+            return {
+                "system_resource": {
+                    "uptime": resource_data.get("uptime", "N/A"),
+                    "cpu_load_percent": cpu_load,
+                    "ram": {
+                        "total_bytes": total_ram,
+                        "used_bytes": used_ram,
+                        "free_bytes": free_ram,
+                        "usage_percent": ram_percent,
+                    },
+                    "disk": {
+                        "total_bytes": total_disk,
+                        "used_bytes": used_disk,
+                        "free_bytes": free_disk,
+                        "usage_percent": disk_percent,
+                    },
+                },
+                "bandwidth": {
+                    "interface": interface_name,
+                    "rx_bps": rx_bps,
+                    "tx_bps": tx_bps,
+                    "rx_kbps": round(rx_bps / 1024, 2),
+                    "tx_kbps": round(tx_bps / 1024, 2),
+                    "rx_mbps": round(rx_bps / (1024 * 1024), 2),
+                    "tx_mbps": round(tx_bps / (1024 * 1024), 2),
+                },
+            }
+        finally:
+            if hasattr(connection, "close"):
+                connection.close()
+
+    # 3. Eksekusi panggilan MikroTik di Threadpool (Non-blocking untuk Async Event Loop)
+    try:
+        data = await run_in_threadpool(fetch_mikrotik_data)
+        return {
+            "label_router": label_router,
+            "id_router": id_router,
+            "host": host,
+            "port": port,
+            "status": "connected",
+            **data,
+        }
+    except Exception as e:
+        print(f"Gagal terhubung ke router {host}:{port}. Error: {str(e)}")
+        return {
+            "label_router": label_router,
+            "id_router": id_router,
+            "host": host,
+            "port": port,
+            "status": "disconnected",
+            "system_resource": {},
+            "bandwidth": {},
+        }
+
+# take data from table 
+
+@router.get("/id", response_model=dict)
+async def get_router_by_ids(
+    router_id: int,
+    current_id: int = Depends(get_current_perusahaan),
+    conn: Connection = Depends(database_connection)
+):
+    try:
+        async with conn.cursor() as cursor:
+            query = "SELECT * FROM tbl_router WHERE id_router = %s AND id_perusahaan = %s"
+            await cursor.execute(query, (router_id, current_id))
+            router = await cursor.fetchone()
+
+        if not router:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Router not found")
+
+        return router
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database Error! {e}"
         )
+
+# test koneksi routeros api
 
 @router.get("/test", response_model=dict)
 async def test_router_connection(
@@ -121,8 +260,8 @@ async def get_router(
 
     except HTTPException as e:
         raise e
+    
     except Exception as e:
-        print(f"[Backend Error /list]: {e}")  # Cek terminal FastAPI untuk log detail
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Database Error! {e}"
@@ -173,8 +312,6 @@ async def get_average_bandwidth(
             avg_download = 0.0
             avg_upload = 0.0
 
-        print(f"[Backend /bandwidth/avg] Total Routers: {total_routers}, Online: {total_online}, Avg Download: {avg_download} kbps, Avg Upload: {avg_upload} kbps")
-
         return {
             "total_routers": total_routers,
             "online_routers": total_online,
@@ -186,14 +323,12 @@ async def get_average_bandwidth(
         }
 
     except Exception as e:
-        print(f"[Backend Error /bandwidth/avg]: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Gagal menghitung statistik bandwidth: {e}"
         )
     
 
-# Route untuk menambahkan data router
 @router.post("/add", response_model=dict, status_code=status.HTTP_201_CREATED)
 async def add_router(
     data: RouterCreate, 
@@ -214,7 +349,9 @@ async def add_router(
             ))
             router_id = cursor.lastrowid
 
-            # 2. Connect ke RouterOS via API
+            mikrotik_msg = "Sinkronisasi MikroTik berhasil."
+
+            # 2. Coba konek & sinkronkan data RouterOS (Di-isolasi agar tidak menggagalkan simpan Router)
             try:
                 connection = routeros_api.RouterOsApiPool(
                     host=data.host,
@@ -225,14 +362,11 @@ async def add_router(
                 )
                 api = connection.get_api()
 
-                # ----------------------------------------------------
                 # 3. Ambil PPP Profile & Simpan ke tbl_paket
-                # ----------------------------------------------------
                 resource_profile = api.get_resource('/ppp/profile')
                 profiles_data = resource_profile.get()
 
                 profile_map = {}
-
                 if profiles_data:
                     query_paket = """
                         INSERT INTO tbl_paket (nama_paket, rate_limit, only_one, id_router)
@@ -240,8 +374,8 @@ async def add_router(
                     """
                     for profile in profiles_data:
                         profile_name = profile.get('name')
-                        rate_limit = profile.get('rate-limit', None)  # Menangkap nilai misal "10M/10M"
-                        only_one = profile.get('only-one', 'default')  # Menangkap "yes", "no", atau "default"
+                        rate_limit = profile.get('rate-limit', None)
+                        only_one = profile.get('only-one', 'default')
                         
                         await cursor.execute(query_paket, (
                             profile_name, 
@@ -251,41 +385,35 @@ async def add_router(
                         ))
                         profile_map[profile_name] = cursor.lastrowid
 
-                # ----------------------------------------------------
-                # 4. Ambil PPP Secret & Match dengan id_paket ke tbl_pelanggan
-                # ----------------------------------------------------
+                # 4. Ambil PPP Secret & Simpan ke tbl_pelanggan
                 resource_ppp = api.get_resource('/ppp/secret')
                 secrets_data = resource_ppp.get()
 
                 if secrets_data:
                     query_pppoe = """
                         INSERT INTO tbl_pelanggan 
-                        (nama_pelanggan, username_pppoe, password_pppoe, id_paket, remote_address, mac_address, id_router, id_perusahaan)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        (nama_pelanggan, username_pppoe, password_pppoe, id_paket, remote_address, mac_address, id_router)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """
                     
                     pppoe_payload = []
                     for secret in secrets_data:
                         service_type = secret.get('service', 'pppoe')
 
-                        # Filter hanya pppoe atau any
                         if service_type in ['pppoe', 'any']:
                             secret_name = secret.get('name')
                             secret_profile = secret.get('profile')
                             id_paket = profile_map.get(secret_profile, None)
-                            
-                            # Di MikroTik RouterOS API, MAC address disimpan di properti 'caller-id'
                             mac_address = secret.get('caller-id', None)
 
                             pppoe_payload.append((
-                                secret_name,                          # nama_pelanggan
-                                secret_name,                          # username_pppoe
-                                secret.get('password', ''),           # password_pppoe
-                                id_paket,                             # id_paket (FK ke tbl_paket)
-                                secret.get('remote-address', None),   # remote_address
-                                mac_address,                          # mac_address (caller-id)
-                                router_id,                            # id_router
-                                current_id                            # id_perusahaan
+                                secret_name,
+                                secret_name,
+                                secret.get('password', ''),
+                                id_paket,
+                                secret.get('remote-address', None),
+                                mac_address,
+                                router_id
                             ))
 
                     if pppoe_payload:
@@ -294,19 +422,15 @@ async def add_router(
                 connection.disconnect()
 
             except Exception as router_err:
-                # Rollback jika gagal terkoneksi atau gagal memproses data MikroTik
-                await conn.rollback()
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=f"Gagal terhubung/sinkronisasi dengan RouterOS API: {str(router_err)}"
-                )
+                # Tangkap error koneksi/API MikroTik di sini tanpa melakukan ROLLBACK
+                mikrotik_msg = f"Gagal terhubung ke MikroTik ({str(router_err)}). Data paket & PPPoE dilewati."
 
-            # 5. Commit semua transaksi jika berhasil
+            # 5. Commit transaksi Database (Data Router tetap tersimpan)
             await conn.commit()
 
         return {
             "status": "success",
-            "message": "Router, Paket, & Data PPPoE Berhasil Ditambahkan!",
+            "message": f"Router berhasil ditambahkan. {mikrotik_msg}",
             "redirect_to": "/admin/routers"
         }
 
@@ -317,31 +441,101 @@ async def add_router(
         await conn.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Terjadi Kesalahan Server! {e}"
+            detail=f"Terjadi Kesalahan Database/Server: {e}"
         )
 
-# Route untuk menghapus data router
 
-@router.delete("/delete", response_model=dict, status_code=status.HTTP_200_OK)
-async def delete_router(data: int, current_id: int = Depends(get_current_perusahaan), conn : Connection = Depends(database_connection)):
+# route utuk mengupdate data router
+@router.put("/update", response_model=dict, status_code=status.HTTP_200_OK)
+async def update_router(
+    data: RouterUpdate, 
+    id_router: int = Query(..., description="ID Router yang ingin diperbarui"),
+    current_id: int = Depends(get_current_perusahaan), 
+    conn: Connection = Depends(database_connection)
+):
     try:
         async with conn.cursor() as cursor:
-            await cursor.execute("DELETE FROM tbl_router WHERE id_router=%s AND id_perusahaan = %s", (data, current_id))
+            query = """
+                UPDATE tbl_router 
+                SET label_router=%s, host=%s, username_router=%s, password_router=%s, port=%s, latitude=%s, longitude=%s
+                WHERE id_router=%s AND id_perusahaan=%s
+            """
+            await cursor.execute(query, (
+                data.label_router, data.host, data.username_router, 
+                data.password_router, data.port, data.latitude, 
+                data.longitude, id_router, current_id
+            ))
             await conn.commit()
 
         return {
-            "status" : "success",
-            "message" : "Data Berhasil di Hapus!",
-            "redirect_to" : "/router"
+            "status": "success",
+            "message": "Data Router berhasil diperbarui."
+        }
+
+    except HTTPException as e:
+        print(f"Error: {e}")
+        raise e
+
+    except Exception as e:
+        await conn.rollback()
+        print(f"Error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Terjadi Kesalahan Database/Server: {e}"
+        )
+
+# Route untuk menghapus data router
+@router.delete("/delete", response_model=dict, status_code=status.HTTP_200_OK)
+async def delete_router(
+    id_router: int, 
+    current_id: int = Depends(get_current_perusahaan), 
+    conn: Connection = Depends(database_connection)
+):
+    try:
+        async with conn.cursor() as cursor:
+            # 1. Hapus pelanggan terkait (Hapus tanda *)
+            await cursor.execute(
+                "DELETE FROM tbl_pelanggan WHERE id_router = %s", 
+                (id_router,)
+            )
+            
+            # 2. Hapus paket terkait (Hapus tanda *)
+            await cursor.execute(
+                "DELETE FROM tbl_paket WHERE id_router = %s", 
+                (id_router,)
+            )
+            
+            # 3. Hapus data router utama
+            await cursor.execute(
+                "DELETE FROM tbl_router WHERE id_router = %s AND id_perusahaan = %s", 
+                (id_router, current_id)
+            )
+            
+            # Cek apakah router benar-benar ada dan terhapus
+            if cursor.rowcount == 0:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Router tidak ditemukan atau Anda tidak memiliki akses."
+                )
+
+            # Simpan perubahan ke database
+            await conn.commit()
+
+        return {
+            "status": "success",
+            "message": "Data Berhasil di Hapus!"
         }
 
     except HTTPException as e:
         raise e
     
     except Exception as e:
+        # Batalkan transaksi jika terjadi kegagalan di tengah jalan
+        await conn.rollback()
+        print(f"Error Delete Router: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Terjadi Kesalahan! {e}"
+            detail=f"Terjadi Kesalahan Server: {e}"
         )
 
 

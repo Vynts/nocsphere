@@ -4,9 +4,150 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Filler,
+  PointElement,
+  LineElement,
+  Tooltip,
+);
+
+const monthlyFinanceData = {
+  labels: ["Mei", "Jun", "Jul", "Agu", "Sep", "Okt"],
+  datasets: [
+    {
+      type: "bar",
+      label: "Pendapatan",
+      data: [8500000, 9200000, 7800000, 11400000, 10800000, 12600000],
+      backgroundColor: "rgba(13, 110, 253, 0.78)",
+      hoverBackgroundColor: "#0b5ed7",
+      borderRadius: 8,
+      borderSkipped: false,
+      maxBarThickness: 36,
+      yAxisID: "revenue",
+    },
+    {
+      type: "line",
+      label: "Invoice terbayar",
+      data: [31, 35, 29, 42, 39, 46],
+      borderColor: "#20a37a",
+      backgroundColor: "rgba(32, 163, 122, 0.10)",
+      pointBackgroundColor: "#ffffff",
+      pointBorderColor: "#20a37a",
+      pointBorderWidth: 2,
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      pointHitRadius: 12,
+      borderWidth: 3,
+      tension: 0.4,
+      fill: true,
+      yAxisID: "invoices",
+    },
+  ],
+};
+
+const monthlyFinanceOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: {
+    duration: 700,
+    easing: "easeOutQuart",
+  },
+  interaction: {
+    mode: "index",
+    intersect: false,
+  },
+  plugins: {
+    legend: {
+      display: false,
+    },
+    tooltip: {
+      backgroundColor: "#0f172a",
+      titleColor: "#ffffff",
+      bodyColor: "#e2e8f0",
+      padding: 12,
+      cornerRadius: 10,
+      displayColors: true,
+      usePointStyle: true,
+      callbacks: {
+        label: (context) => {
+          const value = context.parsed.y;
+          if (context.dataset.yAxisID === "revenue") {
+            return ` ${context.dataset.label}: ${new Intl.NumberFormat(
+              "id-ID",
+              {
+                style: "currency",
+                currency: "IDR",
+                maximumFractionDigits: 0,
+              },
+            ).format(value)}`;
+          }
+          return ` ${context.dataset.label}: ${value} invoice`;
+        },
+      },
+    },
+  },
+  scales: {
+    x: {
+      grid: { display: false },
+      border: { display: false },
+      ticks: {
+        color: "#64748b",
+        padding: 10,
+        font: { size: 11, weight: "500" },
+      },
+    },
+    revenue: {
+      type: "linear",
+      position: "left",
+      beginAtZero: true,
+      border: { display: false },
+      grid: { color: "rgba(148, 163, 184, 0.14)" },
+      ticks: {
+        color: "#64748b",
+        padding: 10,
+        font: { size: 11 },
+        callback: (value) => `Rp ${(value / 1000000).toLocaleString("id-ID")} jt`,
+      },
+    },
+    invoices: {
+      type: "linear",
+      position: "right",
+      beginAtZero: true,
+      border: { display: false },
+      grid: { drawOnChartArea: false },
+      ticks: {
+        color: "#64748b",
+        padding: 10,
+        font: { size: 11 },
+        precision: 0,
+        callback: (value) => `${value}`,
+      },
+    },
+  },
+};
 
 export default function DashboardPage() {
   const router = useRouter();
+  const [financeRange, setFinanceRange] = useState("6");
+  const [visibleFinanceSeries, setVisibleFinanceSeries] = useState({
+    revenue: true,
+    invoices: true,
+  });
   const [routerFilter, setRouterFilter] = useState("All Routers");
   const [routerSort, setRouterSort] = useState("Newest");
   const [invoiceFilter, setInvoiceFilter] = useState("All Invoices");
@@ -22,6 +163,19 @@ export default function DashboardPage() {
   const offlineCount = routers.filter(
     (item) => item.status?.toLowerCase() === "offline",
   ).length;
+
+  const financeRangeLength = Number(financeRange);
+  const financeChartData = {
+    labels: monthlyFinanceData.labels.slice(-financeRangeLength),
+    datasets: monthlyFinanceData.datasets.map((dataset) => ({
+      ...dataset,
+      data: dataset.data.slice(-financeRangeLength),
+      hidden:
+        dataset.yAxisID === "revenue"
+          ? !visibleFinanceSeries.revenue
+          : !visibleFinanceSeries.invoices,
+    })),
+  };
 
   const processedRouters = routers
     .filter((item) => {
@@ -418,6 +572,120 @@ export default function DashboardPage() {
                   Sesi terputus / RTO
                 </span>
               </div>
+            </div>
+          </div>
+
+          {/* MONTHLY REVENUE & PAID INVOICES CHART */}
+          <div
+            className="card p-3 p-sm-4 mb-3 mb-md-4 overflow-hidden"
+            style={{
+              ...cardCleanStyle,
+              background:
+                "linear-gradient(145deg, #ffffff 0%, #f8fbff 100%)",
+            }}
+          >
+            <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+              <div>
+                <h5 className="fw-bold text-dark mb-1 fs-6 fs-md-5">
+                  Pendapatan & Invoice Terbayar
+                </h5>
+                <p className="text-secondary small mb-0">
+                  Tren performa keuangan selama {financeRange} bulan terakhir
+                </p>
+              </div>
+              <div className="d-flex align-items-center justify-content-end flex-wrap gap-2">
+                <select
+                  className="form-select form-select-sm rounded-3"
+                  value={financeRange}
+                  onChange={(event) => setFinanceRange(event.target.value)}
+                  aria-label="Pilih rentang waktu grafik"
+                  style={{
+                    width: "auto",
+                    minWidth: "150px",
+                    borderColor: "#dbe3ee",
+                    color: "#334155",
+                    fontSize: "12px",
+                    boxShadow: "none",
+                  }}
+                >
+                  <option value="3">3 bulan terakhir</option>
+                  <option value="6">6 bulan terakhir</option>
+                </select>
+                {[
+                  {
+                    key: "revenue",
+                    label: "Pendapatan",
+                    color: "#0d6efd",
+                  },
+                  {
+                    key: "invoices",
+                    label: "Invoice terbayar",
+                    color: "#20a37a",
+                  },
+                ].map((series) => (
+                  <label
+                    key={series.key}
+                    className="d-inline-flex align-items-center gap-2 rounded-3 px-2 px-sm-3 border bg-white"
+                    style={{
+                      minHeight: "31px",
+                      cursor: "pointer",
+                      color: visibleFinanceSeries[series.key]
+                        ? "#334155"
+                        : "#94a3b8",
+                      borderColor: "#dbe3ee",
+                      fontSize: "12px",
+                      transition: "all 160ms ease",
+                    }}
+                  >
+                    <input
+                      className="form-check-input m-0"
+                      type="checkbox"
+                      checked={visibleFinanceSeries[series.key]}
+                      onChange={() =>
+                        setVisibleFinanceSeries((current) => ({
+                          ...current,
+                          [series.key]: !current[series.key],
+                        }))
+                      }
+                      aria-label={`Tampilkan ${series.label}`}
+                      style={{
+                        width: "14px",
+                        height: "14px",
+                        cursor: "pointer",
+                        accentColor: series.color,
+                      }}
+                    />
+                    <span className="fw-semibold text-nowrap">
+                      {series.label}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div
+              role="img"
+              aria-label={`Grafik pendapatan dan invoice terbayar: ${financeChartData.labels.join(", ")}`}
+              style={{ height: "300px", minWidth: 0 }}
+            >
+              <Chart
+                type="bar"
+                data={financeChartData}
+                options={{
+                  ...monthlyFinanceOptions,
+                  scales: {
+                    ...monthlyFinanceOptions.scales,
+                    revenue: {
+                      ...monthlyFinanceOptions.scales.revenue,
+                      display: visibleFinanceSeries.revenue,
+                    },
+                    invoices: {
+                      ...monthlyFinanceOptions.scales.invoices,
+                      display: visibleFinanceSeries.invoices,
+                    },
+                  },
+                }}
+              />
             </div>
           </div>
 

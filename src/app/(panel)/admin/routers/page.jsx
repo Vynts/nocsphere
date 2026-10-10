@@ -30,16 +30,7 @@ export default function RoutersPage() {
 
   // State Modal Router
   const [selectedRouter, setSelectedRouter] = useState(null);
-  const [editFormData, setEditFormData] = useState({
-    id_router: "",
-    label_router: "",
-    host: "",
-    port: 8728,
-    username_router: "",
-    password_router: "",
-    autoIsolir: true,
-    status: "offline",
-  });
+  const [deletingRouter, setDeletingRouter] = useState(false);
 
   const cardCleanStyle = {
     backgroundColor: "#ffffff",
@@ -110,7 +101,6 @@ export default function RoutersPage() {
         if (response.status === 401) {
           router.replace("/login_admin");
         }
-        throw new Error(`Gagal mengambil data. Status: ${response.status}`);
       }
 
       const data = await response.json();
@@ -199,16 +189,7 @@ export default function RoutersPage() {
   // -------------------------------------------------------------
   const handleOpenEdit = (routerItem) => {
     setSelectedRouter(routerItem);
-    setEditFormData({
-      id_router: routerItem.id_router || routerItem.id,
-      label_router: routerItem.label_router || routerItem.nama_router || "",
-      host: routerItem.host || routerItem.ip_address || "",
-      port: routerItem.port || 8728,
-      username_router: routerItem.username_router || "",
-      password_router: routerItem.password_router || "",
-      autoIsolir: routerItem.autoIsolir ?? true,
-      status: routerItem.status || "offline",
-    });
+    stateEdit(routerItem);
   };
 
   const handleEditChange = (e) => {
@@ -219,27 +200,97 @@ export default function RoutersPage() {
     }));
   };
 
+  const [editFormData, setEditFormData] = useState({
+    label_router: "",
+    host: "",
+    port: "",
+    username_router: "",
+    password_router: "",
+    latitude: "",
+    longitude: "",
+  });
+
+  const stateEdit = async (routerItem) => {
+    // Cegah error jika routerItem bernilai null atau undefined
+    if (!routerItem) {
+      console.error("Data router tidak valid.");
+      return;
+    }
+
+    const routerId = routerItem.id_router || routerItem.id;
+    
+    if (!routerId) {
+      console.error("ID Router tidak ditemukan pada object:", routerItem);
+      return;
+    }
+
+    // Tampilkan indikator Loading sebelum fetch dimulai
+    setEditFormData({
+      label_router: "Loading...",
+      host: "Loading...",
+      port: "Loading...",
+      username_router: "Loading...",
+      password_router: "Loading...",
+      latitude: "Loading...",
+      longitude: "Loading...",
+    });
+
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`http://localhost:8000/api/router/id?router_id=${routerId}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const routerData = await response.json();
+
+      setEditFormData({
+        label_router: routerData.label_router ?? "",
+        host: routerData.host ?? "",
+        port: routerData.port ?? "",
+        username_router: routerData.username_router ?? "",
+        password_router: routerData.password_router ?? "",
+        latitude: routerData.latitude ?? "",
+        longitude: routerData.longitude ?? "",
+      });
+    } catch (error) {
+      console.error("Gagal mengambil data router:", error);
+    }
+  };
+
   // -------------------------------------------------------------
   // Handler Save Edit (Update State & API)
   // -------------------------------------------------------------
   const handleSaveEdit = async (e) => {
     e.preventDefault();
 
+    const targetId = selectedRouter?.id_router || selectedRouter?.id || editFormData.id_router;
+
+    if (!targetId) {
+      console.error("Gagal memperbarui: ID Router tidak ditemukan.");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("access_token");
-      const targetId = editFormData.id_router || editFormData.id;
 
       // Optional: Kirim update ke Backend FastAPI jika endpoint sudah siap
-      /*
-    await fetch(`http://localhost:8000/api/router/${targetId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(editFormData),
-    });
-    */
+      await fetch(`http://localhost:8000/api/router/update?id_router=${targetId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editFormData),
+      });
+
 
       // Update state lokal routers
       setRouters((prev) =>
@@ -260,13 +311,75 @@ export default function RoutersPage() {
   };
 
   // Handler Hapus Router
-  const handleDeleteRouter = () => {
-    if (selectedRouter) {
-      const targetId = selectedRouter.id_router || selectedRouter.id;
-      setRouters((prev) =>
-        prev.filter((r) => (r.id_router || r.id) !== targetId),
+  const handleDeleteRouter = async (routerToDelete) => {
+    if (!routerToDelete) {
+      console.error("Tidak ada router yang dipilih untuk dihapus.");
+      alert("Pilih router yang ingin dihapus.");
+      return;
+    }
+
+    const rawId = routerToDelete.id_router ?? routerToDelete.id;
+    const targetId = Number(rawId);
+
+    if (!rawId || !Number.isInteger(targetId) || targetId <= 0) {
+      console.error("Gagal menghapus: ID Router tidak valid atau bernilai undefined:", rawId);
+      alert("ID Router tidak valid!");
+      return;
+    }
+
+    setDeletingRouter(true);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        router.replace("/login_admin");
+        return;
+      }
+
+      const response = await fetch(
+        `http://localhost:8000/api/router/delete?id_router=${targetId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
+
+      // Cek jika backend mengembalikan error (misal: 404, 500)
+      if (!response.ok) {
+        let errorMessage = `Gagal menghapus router (Status: ${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          // Gunakan pesan status jika server tidak mengirim JSON.
+        }
+        throw new Error(errorMessage);
+      }
+
+      // 1. Hapus dari state lokal HANYA jika server berhasil menghapus (HTTP 200)
+      setRouters((prev) =>
+        prev.filter((r) => Number(r.id_router ?? r.id) !== targetId)
+      );
+
+      // 2. Reset router yang dipilih
       setSelectedRouter(null);
+
+      // 3. Tutup Modal jika menggunakan Modal Bootstrap
+      const modalElement = document.getElementById("deleteRouterModal");
+      if (modalElement && window.bootstrap) {
+        const modalInstance =
+          window.bootstrap.Modal.getInstance(modalElement) ||
+          window.bootstrap.Modal.getOrCreateInstance(modalElement);
+        modalInstance?.hide();
+      }
+    } catch (err) {
+      console.error("Gagal menghapus router:", err);
+      alert(err instanceof Error ? err.message : "Gagal menghapus router.");
+    } finally {
+      setDeletingRouter(false);
     }
   };
 
@@ -364,28 +477,6 @@ export default function RoutersPage() {
               <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
                 <div className="d-flex align-items-center justify-content-between mb-2">
                   <span className="text-secondary small fw-medium">
-                    Avg Upload Bandwidth
-                  </span>
-                  <div
-                    className="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center p-2"
-                    style={{ width: "32px", height: "32px" }}
-                  >
-                    <i className="bi bi-arrow-up-right fs-6"></i>
-                  </div>
-                </div>
-                <h3 className="fw-bold text-dark mb-1 fs-4">
-                  {bandwidthStats.avg_upload_kbps} Kbps
-                </h3>
-                <span className="text-muted small" style={{ fontSize: "12px" }}>
-                  Rata-rata trafik keluar dari semua router
-                </span>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6">
-              <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
-                <div className="d-flex align-items-center justify-content-between mb-2">
-                  <span className="text-secondary small fw-medium">
                     Avg Download Bandwidth
                   </span>
                   <div
@@ -400,6 +491,29 @@ export default function RoutersPage() {
                 </h3>
                 <span className="text-muted small" style={{ fontSize: "12px" }}>
                   Rata-rata trafik masuk dari semua router
+                </span>
+              </div>
+            </div>
+
+
+            <div className="col-12 col-sm-6">
+              <div className="card p-3 p-sm-4 h-100" style={cardCleanStyle}>
+                <div className="d-flex align-items-center justify-content-between mb-2">
+                  <span className="text-secondary small fw-medium">
+                    Avg Upload Bandwidth
+                  </span>
+                  <div
+                    className="bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center p-2"
+                    style={{ width: "32px", height: "32px" }}
+                  >
+                    <i className="bi bi-arrow-up-right fs-6"></i>
+                  </div>
+                </div>
+                <h3 className="fw-bold text-dark mb-1 fs-4">
+                  {bandwidthStats.avg_upload_kbps} Kbps
+                </h3>
+                <span className="text-muted small" style={{ fontSize: "12px" }}>
+                  Rata-rata trafik keluar dari semua router
                 </span>
               </div>
             </div>
@@ -428,10 +542,10 @@ export default function RoutersPage() {
                     <th className="px-3 px-sm-4 py-3 fw-bold border-bottom">
                       Router ID
                     </th>
-                    <th className="py-3 fw-bold border-bottom">Device Model</th>
-                    <th className="py-3 fw-bold border-bottom">IP / Host</th>
-                    <th className="py-3 fw-bold border-bottom">Port</th>
-                    <th className="py-3 fw-bold border-bottom">Status</th>
+                    <th className="py-3 fw-bold border-bottom text-start">Router Identity</th>
+                    <th className="py-3 fw-bold border-bottom text-center">IP / Host</th>
+                    <th className="py-3 fw-bold border-bottom text-center">Port</th>
+                    <th className="py-3 fw-bold border-bottom text-center">Status</th>
                     <th className="px-3 px-sm-4 py-3 border-bottom text-end">
                       Aksi
                     </th>
@@ -452,6 +566,8 @@ export default function RoutersPage() {
                     paginatedRouters.map((router, index) => {
                       const routerId =
                         router.id_router || router.id || `router-${index}`;
+                      const noUrut = 
+                        index + 1; 
                       const routerName =
                         router.label_router ||
                         router.name ||
@@ -462,14 +578,14 @@ export default function RoutersPage() {
 
                       return (
                         <tr key={routerId}>
-                          <td className="px-3 px-sm-4 py-3 fw-bold text-dark text-nowrap">
-                            <span>{routerId}</span>
+                          <td className="px-3 px-sm-4 py-3 fw-bold text-dark text-nowrap text-start">
+                            <span>{noUrut}</span>
                           </td>
                           <td className="py-3 text-secondary text-nowrap">
                             {routerName}
                           </td>
                           <td
-                            className="py-3 text-dark fw-semibold text-nowrap"
+                            className="py-3 text-dark fw-semibold text-nowrap text-center"
                             style={{ fontSize: "13px" }}
                           >
                             <a
@@ -481,10 +597,10 @@ export default function RoutersPage() {
                               {routerHost}
                             </a>
                           </td>
-                          <td className="py-3 text-secondary text-nowrap">
+                          <td className="py-3 text-secondary text-nowrap text-center">
                             {router.port || "-"}
                           </td>
-                          <td className="py-3 text-nowrap">
+                          <td className="py-3 text-nowrap text-center">
                             <span
                               className="badge rounded-pill px-2 py-1 fw-semibold d-inline-flex align-items-center gap-1"
                               style={{
@@ -514,7 +630,7 @@ export default function RoutersPage() {
                               <button
                                 className="btn btn-sm btn-outline-primary border-0 rounded-2 p-1 px-2 d-inline-flex align-items-center"
                                 data-bs-toggle="modal"
-                                data-bs-target="#editRouterModal"
+                                data-bs-target={`#editRouterModal${router.id}`}
                                 onClick={() => handleOpenEdit(router)}
                                 title="Edit Router"
                               >
@@ -528,6 +644,7 @@ export default function RoutersPage() {
                                 data-bs-target="#deleteRouterModal"
                                 onClick={() => setSelectedRouter(router)}
                                 title="Hapus Router"
+                                aria-label={`Hapus ${router.label_router || router.name || `router ${routerId}`}`}
                               >
                                 <i className="bi bi-trash-fill fs-6"></i>
                               </button>
@@ -575,12 +692,6 @@ export default function RoutersPage() {
                     <option value={50}>50</option>
                   </select>
                 </div>
-
-                {/* Informasi Jumlah Data yang Ditampilkan */}
-                <span className="text-muted small">
-                  Showing {totalItems > 0 ? indexOfFirstItem + 1 : 0} -{" "}
-                  {Math.min(indexOfLastItem, totalItems)} of {totalItems} items
-                </span>
               </div>
 
               {/* Tombol Previous / Next & Info Halaman */}
@@ -627,7 +738,7 @@ export default function RoutersPage() {
       {/* ================= MODAL EDIT ROUTER (FORM LENGKAP) ================= */}
       <div
         className="modal fade"
-        id="editRouterModal"
+        id={`editRouterModal${selectedRouter?.id}`}
         tabIndex="-1"
         aria-labelledby="editRouterModalLabel"
         aria-hidden="true"
@@ -639,7 +750,7 @@ export default function RoutersPage() {
                 className="modal-title fw-bold text-dark fs-5"
                 id="editRouterModalLabel"
               >
-                Edit Router ({editFormData.id})
+                Edit {selectedRouter?.label_router || selectedRouter?.id_router}
               </h5>
               <button
                 type="button"
@@ -652,7 +763,7 @@ export default function RoutersPage() {
               <div className="modal-body p-4">
                 <div className="row g-3">
                   {/* Name */}
-                  <div className="col-12 col-md-6">
+                  <div className="col-12 col-md-12">
                     <label className="form-label fw-semibold text-dark small">
                       Nama Router / Identity{" "}
                       <span className="text-danger">*</span>
@@ -660,53 +771,40 @@ export default function RoutersPage() {
                     <input
                       type="text"
                       className="form-control form-control-sm rounded-3 py-2 shadow-none"
-                      name="name"
-                      value={editFormData.name}
+                      name="label_router"
+                      value={editFormData.label_router}
                       onChange={handleEditChange}
                       required
                     />
-                  </div>
+                  </div>  
 
                   {/* Location */}
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-dark small">
-                      Lokasi / Sektor
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control form-control-sm rounded-3 py-2 shadow-none"
-                      name="location"
-                      value={editFormData.location}
-                      onChange={handleEditChange}
-                    />
-                  </div>
-
-                  {/* IP / Host */}
-                  <div className="col-12 col-md-8">
-                    <label className="form-label fw-semibold text-dark small">
-                      IP Address / Domain VPN{" "}
+                      Host / IP 
                       <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
-                      className="form-control form-control-sm rounded-3 py-2 fw-semibold shadow-none"
-                      name="ip"
-                      value={editFormData.ip}
+                      className="form-control form-control-sm rounded-3 py-2 shadow-none"
+                      name="host"
+                      value={editFormData.host}
                       onChange={handleEditChange}
-                      required
                     />
                   </div>
 
+
                   {/* API Port */}
-                  <div className="col-12 col-md-4">
+                  <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-dark small">
-                      Port API MikroTik <span className="text-danger">*</span>
+                      Port API MikroTik 
+                      <span className="text-danger">*</span>
                     </label>
                     <input
                       type="number"
                       className="form-control form-control-sm rounded-3 py-2 fw-semibold shadow-none"
-                      name="apiPort"
-                      value={editFormData.apiPort}
+                      name="port"
+                      value={editFormData.port}
                       onChange={handleEditChange}
                       required
                     />
@@ -715,13 +813,14 @@ export default function RoutersPage() {
                   {/* Username */}
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-dark small">
-                      API Username
+                      Username Router
+                      <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control form-control-sm rounded-3 py-2 shadow-none"
-                      name="username"
-                      value={editFormData.username}
+                      name="username_router"
+                      value={editFormData.username_router}
                       onChange={handleEditChange}
                       required
                     />
@@ -730,36 +829,48 @@ export default function RoutersPage() {
                   {/* Password */}
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-dark small">
-                      API Password
+                      Password Router
                     </label>
                     <input
                       type="password"
                       className="form-control form-control-sm rounded-3 py-2 shadow-none"
-                      name="password"
-                      value={editFormData.password}
+                      name="password_router"
+                      value={editFormData.password_router}
                       onChange={handleEditChange}
-                      required
                     />
                   </div>
 
                   {/* Status */}
                   <div className="col-12 col-md-6">
                     <label className="form-label fw-semibold text-dark small">
-                      Status Manual
+                      Latitude  
                     </label>
-                    <select
-                      className="form-select form-select-sm rounded-3 py-2 shadow-none"
-                      name="status"
-                      value={editFormData.status}
+                    <input
+                      type="text"
+                      className="form-control form-control-sm rounded-3 py-2 shadow-none"
+                      name="latitude"
+                      value={editFormData.latitude}
                       onChange={handleEditChange}
-                    >
-                      <option value="Online">Online</option>
-                      <option value="Offline">Offline</option>
-                    </select>
+                      required
+                    />
+                  </div>
+
+                  <div className="col-12 col-md-6">
+                    <label className="form-label fw-semibold text-dark small">
+                      Longitude  
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control form-control-sm rounded-3 py-2 shadow-none"
+                      name="longitude"
+                      value={editFormData.longitude}
+                      onChange={handleEditChange}
+                      required
+                    />
                   </div>
 
                   {/* Auto Isolir Switch */}
-                  <div className="col-12 mt-3">
+                  {/* <div className="col-12 mt-3">
                     <div className="form-check form-switch d-flex align-items-center gap-2 ps-0">
                       <input
                         className="form-check-input ms-0 me-2"
@@ -783,7 +894,7 @@ export default function RoutersPage() {
                         Router ini
                       </label>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -829,9 +940,13 @@ export default function RoutersPage() {
               </div>
               <h6 className="fw-bold text-dark mb-2">Hapus Router Ini?</h6>
               <p className="text-muted small mb-0" style={{ fontSize: "13px" }}>
-                Apakah Anda yakin ingin menghapus{" "}
-                <strong>{selectedRouter?.id}</strong>? Tindakan ini tidak dapat
-                dibatalkan.
+                Apakah Anda yakin ingin menghapus Router{" "}
+                <strong>
+                  {selectedRouter?.label_router ||
+                    selectedRouter?.name ||
+                    `#${selectedRouter?.id_router ?? selectedRouter?.id ?? "-"}`}
+                </strong>
+                ? Tindakan ini tidak dapat dibatalkan.
               </p>
             </div>
             <div className="d-flex align-items-center justify-content-center gap-2 mt-3">
@@ -846,11 +961,11 @@ export default function RoutersPage() {
               <button
                 type="button"
                 className="btn btn-danger rounded-3 fw-semibold w-100 py-2 shadow-none"
-                data-bs-dismiss="modal"
-                onClick={handleDeleteRouter}
+                onClick={() => handleDeleteRouter(selectedRouter)}
+                disabled={!selectedRouter || deletingRouter}
                 style={{ fontSize: "13px" }}
               >
-                Hapus
+                {deletingRouter ? "Menghapus..." : "Hapus"}
               </button>
             </div>
           </div>

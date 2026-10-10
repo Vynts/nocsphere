@@ -37,7 +37,6 @@ class RouterResponse(BaseModel):
 
 # Schema Router untuk menngedit data yang mau diedit di dalam database
 class RouterUpdate(BaseModel):
-    id_router: int
     host: Optional[str] = Field(None, example="192.168.88.1")
     label_router: Optional[str] = Field(None , example="Mikrotik1")
     username_router: Optional[str] = Field(None, example="admin")
